@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <meta charset="UTF-8" />
+
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#059669"> <!-- YOUR GREEN COLOR -->
+
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/service-worker.js')
+            .then(registration => {
+              console.log('Service Worker registered with scope:', registration.scope);
+            })
+            .catch(error => {
+              console.error('Service Worker registration failed:', error);
+            });
+        });
+      }
+    </script>
+    
+    <link rel="icon" type="image/png" href="/atmwalimulogo.png" /> 
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@Mwalimu</title>
+
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        /* Optional: Set body background to your app's primary color for a seamless feel */
+        /* background-color: #059669; */ /* YOUR GREEN COLOR */
+      }
+
+      /* Styles for #root BEFORE React loads (for the placeholder) */
+      /* Targets #root only when it has no child elements (i.e., before React hydration) */
+      #root:empty {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%; /* Ensure it takes full width */
+        min-height: 100vh; /* Ensure it takes full height */
+        /* Background color for the splash screen area */
+        /* If your logo has a transparent background and you want the green to show through: */
+        background-color: #059669; /* YOUR GREEN COLOR */
+        /* If your logo looks better on white, even if the app is green: */
+        /* background-color: #ffffff; */
+      }
+
+      /* Styles for #root AFTER React loads (it will have children) */
+      #root {
+        min-height: 100vh; /* Still want it to be full height capable */
+        width: 100%;
+        /* display: block; by default or whatever your app needs */
+      }
+
+      .app-splash-logo-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+      }
+
+      .app-splash-logo-container img {
+        max-width: 60vw; /* Logo takes up to 60% of viewport width */
+        max-height: 60vh; /* Logo takes up to 60% of viewport height */
+        width: auto;      /* Maintain aspect ratio */
+        height: auto;     /* Maintain aspect ratio */
+        object-fit: contain; /* Ensures the image is scaled correctly within bounds */
+      }
+
+      /* Hide the placeholder once React has injected content into #root */
+      /* This is a fallback, React replacing content is the primary mechanism */
+      #root:not(:empty) .app-splash-logo-container {
+        display: none;
+      }
+
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <!-- This content will be shown before React loads and replaces it -->
+      <div class="app-splash-logo-container">
+        <!--
+          Logo: Ensure 'atmwalimulogo.png' is in your 'public' folder.
+        -->
+        <img src="/atmwalimulogo.png" alt="@Mwalimu" />
+      </div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

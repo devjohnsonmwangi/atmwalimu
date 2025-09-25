@@ -1,0 +1,113 @@
+/* src/index.css */
+
+/* --- 1. Font Import --- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* --- 2. Core Tailwind Imports --- */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* --- 3. Base App Styles --- */
+@layer base {
+  body {
+    /* Apply our base theme colors, font, and a smooth transition effect globally */
+    @apply bg-base-100 text-base-content transition-colors duration-300;
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* 
+    This is the key integration for external libraries.
+    We are telling FullCalendar to use our DaisyUI theme's CSS variables for its colors.
+    This makes it automatically theme-aware.
+    
+    '--p' = primary, '--b1' = base-100, '--pc' = primary-content (text on primary bg), etc.
+    The `hsl()` wrapper is the correct way to use DaisyUI variables in raw CSS.
+  */
+  :root {
+    --fc-border-color: hsl(var(--b3));
+    --fc-daygrid-day-bg-color: transparent;
+    --fc-day-today-bg-color: hsl(var(--p) / 0.15); /* Primary color with low opacity */
+    --fc-event-bg-color: hsl(var(--p));
+    --fc-event-border-color: hsl(var(--p));
+    --fc-event-text-color: hsl(var(--pc)); /* primary-content color from DaisyUI */
+    --fc-page-bg-color: hsl(var(--b2)); /* Use secondary background for the calendar itself */
+    --fc-list-event-hover-bg-color: hsl(var(--b3));
+
+    /* Text colors */
+    --fc-col-header-cell-cushion-text-color: hsl(var(--bc)); /* base-content */
+    --fc-daygrid-day-number-color: hsl(var(--n)); /* neutral */
+    --fc-toolbar-title-text-color: hsl(var(--nc)); /* neutral-content */
+  }
+}
+
+/* --- 4. Custom Component Styles --- */
+@layer components {
+  /* 
+    Your unique hero background animation is preserved.
+    It already works perfectly with the .dark class system.
+  */
+  .hero-animated-bg {
+    @apply relative overflow-hidden;
+  }
+  .hero-animated-bg::before {
+    content: "";
+    @apply absolute inset-0 z-0;
+    background: linear-gradient(45deg, rgba(25, 25, 112, 0.25), rgba(0, 128, 128, 0.15), rgba(72, 61, 139, 0.25), rgba(0, 100, 0, 0.15));
+    background-size: 400% 400%;
+    animation: gradientDrift 25s ease infinite;
+  }
+  .dark .hero-animated-bg::before {
+    background: linear-gradient(45deg, rgba(10, 10, 50, 0.45), rgba(0, 70, 70, 0.35), rgba(30, 20, 80, 0.45), rgba(0, 50, 0, 0.35));
+  }
+  /* Keyframes are now defined in tailwind.config.js, so we reference them here. */
+  @keyframes gradientDrift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+  @keyframes subtleMove { from { transform: translate(0, 0) rotate(0deg); } to { transform: translate(-25px, 35px) rotate(12deg); } }
+
+  /* 
+    Simplified react-datepicker overrides using DaisyUI semantic classes.
+    These styles will now automatically adapt to our light and dark themes.
+  */
+  .react-datepicker {
+    @apply font-sans border-base-300 bg-base-100 text-base-content rounded-lg shadow-lg;
+  }
+  .react-datepicker__header {
+    @apply bg-base-200 border-b border-base-300;
+  }
+  .react-datepicker__current-month, .react-datepicker-time__header, .react-datepicker-year-header {
+    @apply text-base-content font-semibold;
+  }
+  .react-datepicker__day-name, .react-datepicker__day, .react-datepicker__time-name {
+    @apply text-base-content;
+  }
+  .react-datepicker__day:hover {
+    @apply bg-base-300 rounded-md;
+  }
+  .react-datepicker__day--selected, .react-datepicker__day--in-range {
+    @apply bg-primary text-primary-content rounded-md font-semibold;
+  }
+  .react-datepicker__day--selected:hover, .react-datepicker__day--in-range:hover {
+    @apply bg-primary-focus; /* DaisyUI class for a slightly darker primary color */
+  }
+  .react-datepicker__day--disabled {
+    @apply text-base-content/40; /* 40% opacity */
+  }
+}
+
+/* --- 5. Custom Utility Styles --- */
+@layer utilities {
+  /* Custom styled scrollbar for a native-app feel */
+  .styled-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .styled-scrollbar::-webkit-scrollbar-track {
+    @apply bg-base-200;
+  }
+  .styled-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-base-300 rounded-full border-2 border-solid border-base-200;
+  }
+  .styled-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-neutral/40;
+  }
+}
