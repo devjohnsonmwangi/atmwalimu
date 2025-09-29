@@ -12,19 +12,19 @@ export interface Document {
   uploaderId: number | null;
   title: string;
   description: string | null;
-  genre: string; // <-- NEW: The genre of the document
+  genre: string;
   documentUrl: string;
-  price: string;
+  price: number; // <-- CORRECTED: Changed from string to number for consistency
   isFree: boolean;
   isApproved: boolean;
-  averageRating: string;
+  averageRating: string; // Kept as string, assuming it can be formatted like "4.5"
   isFeatured: boolean;
   downloadCount: number;
   createdAt: string;
   updatedAt: string;
 }
 
-// <-- NEW: Type for the grouped library response -->
+// Type for the grouped library response
 export interface GroupedDocumentsResponse {
     [genre: string]: Document[];
 }
@@ -48,8 +48,8 @@ export interface PaginatedDocumentsResponse {
 export interface CreateDocumentPayload {
   title: string;
   description?: string;
-  genre: string; // <-- NEW: Genre is required on creation
-  price: number;
+  genre: string;
+  price: number; // This was already correct (number)
   file: File;
   isFeatured?: boolean;
 }
@@ -57,7 +57,7 @@ export interface CreateDocumentPayload {
 export interface UploadForApprovalPayload {
     title: string;
     description: string;
-    genre: string; // <-- NEW: Genre is required on submission
+    genre: string;
     file: File;
 }
 
@@ -65,12 +65,12 @@ export interface ApproveDocumentPayload {
     documentId: number;
     updates: {
         isApproved: boolean;
-        price?: number;
-        genre?: string; // <-- NEW: Optionally update genre on approval
+        price?: number; // Price is correctly a number here
+        genre?: string;
     };
 }
 
-// <-- MODIFIED: Added 'genre' to the list of updatable fields -->
+// CORRECTED: This now correctly references `price` as a number from the Document interface
 export type UpdateDocumentPayload = { documentId: number } & Partial<Pick<Document, 'title' | 'description' | 'price' | 'isFeatured' | 'genre'>>;
 
 // --- Payment Types ---
@@ -95,7 +95,7 @@ export interface PaymentResponse {
   documentId: number | null;
   planId: number | null;
   documentIds: number[] | null;
-  amount: string;
+  amount: string; // Often a string from payment APIs to handle decimal precision
   status: 'pending' | 'completed' | 'failed';
   checkoutRequestId: string;
   mpesaReceiptNumber: string | null;
@@ -138,14 +138,11 @@ export const documentsApi = createApi({
       providesTags: (_, __, documentId) => [{ type: 'Document', id: documentId }],
     }),
 
-    // <-- NEW: Endpoint to fetch documents grouped by genre for the public library -->
     fetchDocumentsByGenre: builder.query<GroupedDocumentsResponse, void>({
-        query: () => 'documents/library', // Hits the new /library endpoint
+        query: () => 'documents/library',
         providesTags: (result) => result
           ? [
-              // Provides individual tags for each document within the groups
               ...Object.values(result).flat().map(({ documentId }) => ({ type: 'Document' as const, id: documentId })),
-              // Provides a general list tag for invalidation
               { type: 'DocumentsList', id: 'GROUPED_BY_GENRE' },
             ]
           : [{ type: 'DocumentsList', id: 'GROUPED_BY_GENRE' }],
@@ -163,7 +160,6 @@ export const documentsApi = createApi({
         query: ({ file, ...metadata }) => {
             const formData = new FormData();
             formData.append('file', file);
-            // Append all metadata, including the new 'genre' field
             Object.entries(metadata).forEach(([key, value]) => {
               formData.append(key, value.toString());
             });
@@ -181,13 +177,14 @@ export const documentsApi = createApi({
       query: ({ file, ...metadata }) => {
         const formData = new FormData();
         formData.append('file', file);
-        // Append all metadata, including the new 'genre' field
+        // This logic is fine, as .toString() works correctly on numbers, booleans, etc.
         Object.entries(metadata).forEach(([key, value]) => {
-          formData.append(key, value.toString());
+          if (value !== undefined) { // Ensure optional fields aren't sent if they're undefined
+            formData.append(key, value.toString());
+          }
         });
         return { url: 'documents/upload', method: 'POST', body: formData };
       },
-      // Invalidate both list types to refresh all public views
       invalidatesTags: [{ type: 'DocumentsList', id: 'PAGINATED' }, { type: 'DocumentsList', id: 'GROUPED_BY_GENRE' }],
     }),
 
@@ -195,7 +192,7 @@ export const documentsApi = createApi({
       query: ({ documentId, ...patch }) => ({
         url: `documents/${documentId}`,
         method: 'PATCH',
-        body: patch,
+        body: patch, // For JSON patches, no need for FormData
       }),
       invalidatesTags: (_, __, { documentId }) => [
         { type: 'Document', id: documentId },
@@ -206,9 +203,10 @@ export const documentsApi = createApi({
 
     updateDocumentFeaturedStatus: builder.mutation<Document, { documentId: number; isFeatured: boolean }>({
         query: ({ documentId, ...patch }) => ({ url: `documents/${documentId}`, method: 'PATCH', body: patch }),
+        // Optimistic update example
         async onQueryStarted({ documentId, isFeatured }, { dispatch, queryFulfilled }) {
             const patchResult = dispatch(
-                documentsApi.util.updateQueryData('fetchDocuments', {}, (draft) => {
+                documentsApi.util.updateQueryData('fetchDocuments', {} as DocumentQueryParams, (draft) => {
                     const doc = draft.data.find(d => d.documentId === documentId);
                     if (doc) doc.isFeatured = isFeatured;
                 })
@@ -234,7 +232,6 @@ export const documentsApi = createApi({
             method: 'PATCH',
             body: updates,
         }),
-        // Invalidate all relevant caches to reflect the change everywhere
         invalidatesTags: [
             { type: 'PendingDocuments', id: 'LIST' },
             { type: 'DocumentsList', id: 'PAGINATED' },
@@ -288,7 +285,7 @@ export const {
   useLazyFetchDocumentsQuery,
   useFetchDocumentByIdQuery,
   useFetchMyLibraryQuery,
-  useFetchDocumentsByGenreQuery, // <-- NEW: Hook for the organized library
+  useFetchDocumentsByGenreQuery,
 
   // --- User & Admin Mutation Hooks ---
   useUploadDocumentForApprovalMutation,
