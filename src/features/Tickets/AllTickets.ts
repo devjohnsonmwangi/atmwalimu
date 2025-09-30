@@ -1,91 +1,154 @@
-// src/features/ticket/TicketAPI.ts
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { APIDomain } from './../../utils/APIDomain';
-// ACTION REQUIRED: Make sure this path points to your Redux store configuration
-import type { RootState } from "../../app/store";
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { APIDomain } from '../../utils/APIDomain'; // Your API base URL
+import type { RootState } from '../../app/store';
 
-export interface UserTicketData {
-    tickets: TypeTickets[]; // Array of tickets
+// =========================================================================
+// --- Type Definitions (Corrected to Match NestJS DTOs) ---
+// =========================================================================
+
+/**
+ * Represents the sender of a message, matching the `SenderDto`.
+ */
+export interface UserSummary {
+  userId: number;
+  fullName: string;
+  email: string; // Optional but useful
 }
 
-export interface TypeTickets {
-    ticket_id: number;
-    user_id: number;
-    subject: string;
-    description: string;
-    status: string;
-    updated_at: string;
-    created_at: string;
-    creator: {
-        full_name: string;
-        email: string;
-        phone_number: string;
-    };
+/**
+ * Represents a single message, matching the `TicketMessageDto`.
+ */
+export interface SupportMessage {
+  messageId: number;
+  message: string; // CORRECTED: Was 'content'
+  createdAt: string;
+  sender: UserSummary; // CORRECTED: Was 'author'
 }
 
-export const TicketAPI = createApi({
-    reducerPath: 'TicketAPI',
-    // ✨ MODIFICATION: Updated baseQuery to automatically add the auth token
-    baseQuery: fetchBaseQuery({ 
-        baseUrl: APIDomain,
-        prepareHeaders: (headers, { getState }) => {
-            // Get the token from the user slice in the Redux store
-            const token = (getState() as RootState).user.token;
+/**
+ * Represents a full support ticket object, matching the `SupportTicketResponseDto`.
+ */
+export interface SupportTicket {
+  ticketId: number;
+  userId: number;
+  assigneeId: number | null;
+  subject: string;
+  status: 'open' | 'in_progress' | 'closed';
+  priority: 'low' | 'medium' | 'high';
+  createdAt: string;
+  updatedAt: string;
+  user: UserSummary;
+  messages: SupportMessage[];
+}
 
-            // If the token exists, add it to the authorization header
-            if (token) {
-                headers.set('authorization', `Bearer ${token}`);
-            }
-            return headers;
-        },
+/**
+ * Data for creating a new ticket, matching `CreateSupportTicketDto`.
+ */
+export interface CreateTicketDto {
+  subject: string;
+  description: string; // CORRECTED: Was 'initialMessage'
+}
+
+/**
+ * Data for adding a new message, matching `AddMessageDto`.
+ */
+export interface AddMessageDto {
+  message: string; // CORRECTED: Was 'content'
+}
+
+/**
+ * Data for updating a ticket's metadata (Admin only), matching `UpdateTicketDto`.
+ */
+export interface UpdateTicketDto {
+  status?: 'open' | 'in_progress' | 'closed';
+  priority?: 'low' | 'medium' | 'high';
+  assigneeId?: number;
+}
+
+
+// =========================================================================
+// --- RTK Query API Slice Definition ---
+// =========================================================================
+
+export const supportTicketApi = createApi({
+  reducerPath: 'supportTicketApi',
+  baseQuery: fetchBaseQuery({
+    baseUrl: APIDomain,
+    prepareHeaders: (headers, { getState }) => {
+      const token = (getState() as RootState).user.accessToken;
+      if (token) {
+        headers.set('authorization', `Bearer ${token}`);
+      }
+      return headers;
+    },
+  }),
+  tagTypes: ['SupportTicket', 'SupportTicketList'],
+  endpoints: (builder) => ({
+    // ================== USER-FACING ENDPOINTS ==================
+    createUserTicket: builder.mutation<SupportTicket, CreateTicketDto>({
+      query: (newTicketData) => ({
+        url: 'support-tickets',
+        method: 'POST',
+        body: newTicketData,
+      }),
+      invalidatesTags: ['SupportTicketList'],
     }),
-    refetchOnReconnect: true,
-    tagTypes: ['ticket'],
-    endpoints: (builder) => ({
-        getTickets: builder.query<TypeTickets[], void>({
-            query: () => '/ticket',
-            providesTags: ['ticket'],
-        }),
-        createTicket: builder.mutation<TypeTickets, Partial<TypeTickets>>({
-            query: (newTicket) => ({
-                url: 'ticket',
-                method: 'POST',
-                body: newTicket,
-            }),
-            invalidatesTags: ['ticket'],
-        }),
-        updateTicket: builder.mutation<TypeTickets, { ticket_id: number } & Partial<TypeTickets>>({
-            query: ({ ticket_id, ...rest }) => ({
-                url: `ticket/${ticket_id}`,
-                method: 'PUT',
-                body: rest,
-            }),
-            invalidatesTags: ['ticket'],
-        }),
-        deleteTicket: builder.mutation<{ success: boolean; id: number }, number>({
-            query: (id) => ({
-                url: `ticket/${id}`,
-                method: 'DELETE',
-            }),
-            invalidatesTags: ['ticket'],
-        }),
-        getTicketById: builder.query<TypeTickets, number>({
-            query: (id) => `ticket/${id}`,
-            providesTags: (_result, _error, arg) => [{ type: 'ticket', id: arg }],
-        }),
-        getUserTickets: builder.query<TypeTickets[], number>({
-            query: (id) => `/ticket/user/${id}`,
-            providesTags: ['ticket'],
-        }),
+    getUserTickets: builder.query<SupportTicket[], void>({
+      query: () => 'support-tickets',
+      providesTags: ['SupportTicketList'],
     }),
+    getUserTicketById: builder.query<SupportTicket, number>({
+      query: (ticketId) => `support-tickets/${ticketId}`,
+      providesTags: (_result, _error, ticketId) => [{ type: 'SupportTicket', id: ticketId }],
+    }),
+    addUserMessage: builder.mutation<void, { ticketId: number; data: AddMessageDto }>({
+      query: ({ ticketId, data }) => ({
+        url: `support-tickets/${ticketId}/messages`,
+        method: 'POST',
+        body: data, // CORRECTED: Pass the data object directly
+      }),
+      invalidatesTags: (_result, _error, { ticketId }) => [{ type: 'SupportTicket', id: ticketId }],
+    }),
+
+    // ================== ADMIN-ONLY ENDPOINTS ==================
+    getAllTicketsForAdmin: builder.query<SupportTicket[], void>({
+      query: () => 'admin/support-tickets',
+      providesTags: ['SupportTicketList'],
+    }),
+    getTicketByIdForAdmin: builder.query<SupportTicket, number>({
+      query: (ticketId) => `admin/support-tickets/${ticketId}`,
+      providesTags: (_result, _error, ticketId) => [{ type: 'SupportTicket', id: ticketId }],
+    }),
+    addMessageForAdmin: builder.mutation<void, { ticketId: number; data: AddMessageDto }>({
+      query: ({ ticketId, data }) => ({
+        url: `admin/support-tickets/${ticketId}/messages`,
+        method: 'POST',
+        body: data, // CORRECTED: Pass the data object directly
+      }),
+      invalidatesTags: (_result, _error, { ticketId }) => [{ type: 'SupportTicket', id: ticketId }],
+    }),
+    updateTicketForAdmin: builder.mutation<SupportTicket, { ticketId: number; data: UpdateTicketDto }>({
+      query: ({ ticketId, data }) => ({
+        url: `admin/support-tickets/${ticketId}`,
+        method: 'PATCH',
+        body: data,
+      }),
+      invalidatesTags: (_result, _error, { ticketId }) => [
+        { type: 'SupportTicket', id: ticketId },
+        'SupportTicketList',
+      ],
+    }),
+  }),
 });
 
-// Export hooks for usage in components
+// Export the auto-generated hooks for use in your components
 export const {
-    useGetTicketsQuery,
-    useCreateTicketMutation,
-    useUpdateTicketMutation,
-    useDeleteTicketMutation,
-    useGetTicketByIdQuery,
-    useGetUserTicketsQuery,
-} = TicketAPI;
+  useCreateUserTicketMutation,
+  useGetUserTicketsQuery,
+  useGetUserTicketByIdQuery,
+  useAddUserMessageMutation,
+  useGetAllTicketsForAdminQuery,
+  useGetTicketByIdForAdminQuery,
+  useAddMessageForAdminMutation,
+  useUpdateTicketForAdminMutation,
+} = supportTicketApi;

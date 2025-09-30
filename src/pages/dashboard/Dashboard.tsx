@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import Navbar from "../../components/navbar/Navbar"; // Correctly included for a self-contained layout
+//import Navbar from "../../components/navbar/Navbar"; // Correctly included for a self-contained layout
 import Drawer from "./aside/Drawer"; 
 import { useSelector } from 'react-redux';
 import { RootState } from "../../app/store"; 
@@ -36,7 +36,7 @@ const Dashboard = () => {
       <div className="h-screen flex flex-col bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
         
         {/* 1. The Navbar is rendered at the top of the dashboard. */}
-        <Navbar />
+       
 
         {/* 
           2. This div is the main content area.
@@ -47,7 +47,7 @@ const Dashboard = () => {
           
           {/* The desktop sidebar drawer */}
           <aside className="hidden lg:flex lg:flex-col lg:w-64 flex-shrink-0">
-            <Drawer />
+            <Drawer isMobileOpen={false} onMobileClose={() => {}} />
           </aside>
           
           {/* The main scrollable content area */}

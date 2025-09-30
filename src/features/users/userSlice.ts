@@ -21,6 +21,7 @@ export interface User {
     socialLinks?: Record<string, string>;
     createdAt: string;
     updatedAt: string;
+    notificationCount?: number; // Optional, as it may not always be present
 }
 
 /**
@@ -39,8 +40,11 @@ export interface LoginSuccessPayload {
  * The state for this slice, holding the user's authentication info.
  */
 export interface UserState {
+    id: number;
     accessToken: string | null;
     user: User | null;
+    role: string; // Added role to the state for easy access
+    email: string; // Added email to the state for easy access
 }
 
 // =================================================================
@@ -50,6 +54,10 @@ export interface UserState {
 const initialState: UserState = {
     accessToken: localStorage.getItem('authToken') || null, // Rehydrate token from localStorage
     user: null, // User info is fetched on app load or after login
+    role: '', // Default empty string for role
+    email: '', // Default empty string for email
+    id: 0, // Default ID
+    
 }
 
 // =================================================================
@@ -89,9 +97,19 @@ export default userSlice.reducer;
 // =================================================================
 // SELECTORS (Updated to use new state structure and camelCase properties)
 // =================================================================
+//export const selectCurrentUser = (state: RootState) => state.user.user;
 
 export const selectCurrentUser = (state: RootState): User | null => state.user.user;
 export const selectCurrentToken = (state: RootState): string | null => state.user.accessToken;
 export const selectIsAuthenticated = (state: RootState): boolean => !!state.user.accessToken;
 export const selectCurrentUserId = (state: RootState): number | undefined => state.user.user?.userId;
 export const selectUserRole = (state: RootState): string | undefined => state.user.user?.role;
+
+// Select specific, commonly used properties from the user object.
+// Optional chaining (?.) is crucial here because `user` can be `null`.
+export const selectUserId = (state: RootState): number | undefined => selectCurrentUser(state)?.userId;
+
+export const selectUserFullName = (state: RootState): string | undefined => selectCurrentUser(state)?.fullName;
+export const selectUserEmail = (state: RootState): string | undefined => selectCurrentUser(state)?.email;
+export const selectUserProfilePictureUrl = (state: RootState): string | null | undefined => selectCurrentUser(state)?.profilePictureUrl;
+export const selectUserNotificationCount = (state: RootState): number | undefined => selectCurrentUser(state)?.notificationCount;

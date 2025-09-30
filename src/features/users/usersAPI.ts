@@ -1,16 +1,12 @@
 // src/features/users/usersAPI.ts
 
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { APIDomain } from "../../utils/APIDomain";
+import { APIDomain } from "../../utils/APIDomain"; // Adjust path to your domain utility
 
 // =================================================================
-// INTERFACES
+// INTERFACES (Aligned with Backend DTO)
 // =================================================================
 
-/**
- * Represents the user data structure received from the API.
- * Matches the UserResponseDto from the backend.
- */
 export interface UserApiResponse {
   userId: number;
   fullName: string;
@@ -19,31 +15,25 @@ export interface UserApiResponse {
   bio?: string;
   role: "admin" | "user" | "teacher" | "lecturer" | "student" | "blogger" | "tutor";
   reputationScore?: number;
-  socialLinks?: Record<string, string>;
+  socialLinks?: {
+    twitter?: string;
+    linkedIn?: string;
+    website?: string;
+  };
   createdAt: string;
   updatedAt: string;
 }
 
-/**
- * Represents user data used within the client, potentially including a password for forms.
- */
 export interface UserDataTypes extends UserApiResponse {
   password?: string;
 }
 
-/**
- * Defines the payload for updating a user's general profile information.
- */
-export interface UserUpdatePayload extends Partial<Omit<UserApiResponse, 'userId' | 'createdAt' | 'updatedAt' | 'role'>> {}
+export interface UserUpdatePayload extends Partial<Omit<UserApiResponse, 'userId' | 'createdAt' | 'updatedAt' | 'role' | 'email' | 'reputationScore'>> {}
 
-/**
- * NEW: Defines the payload for an admin updating a user's role.
- */
 export interface UpdateUserRolePayload {
   role: UserApiResponse['role'];
 }
 
-// Password-related interfaces
 export interface PasswordResetRequestPayload {
   email: string;
 }
@@ -100,10 +90,7 @@ export const usersAPI = createApi({
       query: () => "users",
       providesTags: (result) =>
         result
-          ? [
-              ...result.map(({ userId }) => ({ type: 'User' as const, id: userId })),
-              { type: 'Users', id: 'LIST' },
-            ]
+          ? [ ...result.map(({ userId }) => ({ type: 'User' as const, id: userId })), { type: 'Users', id: 'LIST' } ]
           : [{ type: 'Users', id: 'LIST' }],
     }),
 
@@ -111,33 +98,40 @@ export const usersAPI = createApi({
       query: (role) => `users/roles/${role}`,
       providesTags: (result) =>
         result
-          ? [
-              ...result.map(({ userId }) => ({ type: 'User' as const, id: userId })),
-              { type: 'Users', id: 'ROLES_LIST' },
-            ]
+          ? [ ...result.map(({ userId }) => ({ type: 'User' as const, id: userId })), { type: 'Users', id: 'ROLES_LIST' } ]
           : [{ type: 'Users', id: 'ROLES_LIST' }],
     }),
 
+    // =================================================================
+    // === THE FINAL, BULLETPROOF updateUser MUTATION ===
+    // This pattern explicitly removes the `userId` to satisfy both the backend and strict ESLint rules.
+    // =================================================================
     updateUser: builder.mutation<UserApiResponse, { userId: number } & UserUpdatePayload>({
-        query: (payloadToSend) => ({
-            url: `users/me`, // This now correctly points to the endpoint for a user updating their own profile
-            method: "PATCH", // Corrected from PUT to PATCH for partial updates
-            body: payloadToSend,
-        }),
-        invalidatesTags: (_, __, { userId }) => [{ type: 'User', id: userId }, { type: 'Users', id: 'LIST' }],
+      query: (arg) => {
+        // 1. Create a shallow copy of the argument object.
+        const body = { ...arg };
+
+        // 2. Explicitly delete the `userId` property from the copy.
+        //    This guarantees it is NOT sent to the server.
+        //    This also resolves any "unused variable" ESLint errors.
+        delete (body as Partial<typeof body>).userId;
+
+        return {
+          url: `users/me`,
+          method: "PATCH",
+          body,
+        };
+      },
+      // The original `userId` is still available in `arg` for invalidation logic.
+      invalidatesTags: (_, __, { userId }) => [{ type: 'User', id: userId }, { type: 'Users', id: 'LIST' }],
     }),
 
-    /**
-     * NEW: Mutation for admins to update a user's role.
-     * This hits the new PATCH /users/:id/role endpoint.
-     */
     updateUserRoleByAdmin: builder.mutation<UserApiResponse, { userId: number } & UpdateUserRolePayload>({
       query: ({ userId, ...payloadToSend }) => ({
         url: `users/${userId}/role`,
         method: 'PATCH',
-        body: payloadToSend, // Body will be { "role": "new-role" }
+        body: payloadToSend,
       }),
-      // Invalidate the specific user's cache and the list of all users
       invalidatesTags: (_, __, { userId }) => [{ type: 'User', id: userId }, { type: 'Users', id: 'LIST' }],
     }),
 
@@ -162,14 +156,14 @@ export const usersAPI = createApi({
   }),
 });
 
-// Auto-generated hooks, now including the new useUpdateUserRoleByAdminMutation
+// Auto-generated hooks for use in components
 export const {
   useRegisterUserMutation,
   useGetUserByIdQuery,
   useFetchUsersQuery,
   useFetchUsersByRoleQuery,
   useUpdateUserMutation,
-  useUpdateUserRoleByAdminMutation, // <-- New hook is exported
+  useUpdateUserRoleByAdminMutation,
   useDeleteUserMutation,
   useRequestPasswordResetMutation,
   useResetPasswordMutation,

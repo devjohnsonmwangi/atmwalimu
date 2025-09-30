@@ -1,69 +1,67 @@
-// src/features/tickets/ticketSlice.ts
-
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface Ticket {
-    ticket_id: number;
-    user: {
-        full_name: string;
-        email: string;
-    };
+// Define the shape of the UI-related state for the support ticket feature
+interface SupportTicketUIState {
+  filters: {
     subject: string;
-    description: string;
-    status: string;
-    updated_at: string;
+    status: '' | 'open' | 'in_progress' | 'closed';
+    // Admin-specific filters
+    userName: string;
+    userEmail: string;
+  };
+  toast: {
+    message: string;
+    type: 'success' | 'error';
+  } | null;
 }
 
-interface TicketState {
-    tickets: Ticket[];
-    filters: {
-        full_name: string;
-        email: string;
-        subject: string;
-        status: string;
-    };
-    selectedTickets: Set<number>;
-    toastMessage: string | null;
-    toastType: 'success' | 'error' | null;
-}
-
-const initialState: TicketState = {
-    tickets: [],
-    filters: {
-        full_name: '',
-        email: '',
-        subject: '',
-        status: ''
-    },
-    selectedTickets: new Set(),
-    toastMessage: null,
-    toastType: null
+const initialState: SupportTicketUIState = {
+  filters: {
+    subject: '',
+    status: '',
+    userName: '',
+    userEmail: '',
+  },
+  toast: null,
 };
 
-const ticketSlice = createSlice({
-    name: 'tickets',
-    initialState,
-    reducers: {
-        setTickets(state, action: PayloadAction<Ticket[]>) {
-            state.tickets = action.payload;
-        },
-        setFilters(state, action: PayloadAction<TicketState['filters']>) {
-            state.filters = action.payload;
-        },
-        setSelectedTickets(state, action: PayloadAction<Set<number>>) {
-            state.selectedTickets = action.payload;
-        },
-        showToast(state, action: PayloadAction<{ message: string; type: 'success' | 'error' }>) {
-            const { message, type } = action.payload;
-            state.toastMessage = message;
-            state.toastType = type;
-        },
-        resetFilters(state) {
-            state.filters = initialState.filters;
-        }
-    }
+const supportTicketSlice = createSlice({
+  name: 'supportTicketUI', // Renamed to clarify its purpose
+  initialState,
+  reducers: {
+    /**
+     * Updates the filter values in the state.
+     * Can be used for search and filter inputs in the UI.
+     */
+    setTicketFilters(state, action: PayloadAction<Partial<SupportTicketUIState['filters']>>) {
+      state.filters = { ...state.filters, ...action.payload };
+    },
+    /**
+     * Resets all filters to their initial empty state.
+     */
+    resetTicketFilters(state) {
+      state.filters = initialState.filters;
+    },
+    /**
+     * Sets a toast message to be displayed to the user.
+     */
+    showToast(state, action: PayloadAction<{ message: string; type: 'success' | 'error' }>) {
+      state.toast = action.payload;
+    },
+    /**
+     * Hides the current toast message.
+     */
+    hideToast(state) {
+      state.toast = null;
+    },
+  },
 });
 
-export const { setTickets, setFilters, setSelectedTickets, showToast, resetFilters } = ticketSlice.actions;
-export default ticketSlice.reducer;
+export const {
+  setTicketFilters,
+  resetTicketFilters,
+  showToast,
+  hideToast,
+} = supportTicketSlice.actions;
 
+export default supportTicketSlice.reducer;

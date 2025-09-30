@@ -25,8 +25,6 @@ import Error from './pages/Error.tsx';
 
 // --- IMPORT ALL DOCUMENT & LIBRARY COMPONENTS ---
 import AllDocumentsPage from './pages/dashboard/main/managedocs/AllDocumentsPage.tsx';
-//import DocumentDetailPage from './pages/dashboard/main/managedocs/DocumentDetailPage.tsx';
-//import MyLibraryPage from './pages/dashboard/main/managedocs/MyLibraryPage.tsx';
 import CartPage from './pages/dashboard/main/managedocs/CartPage.tsx';
 import LibraryPage from './pages/dashboard/main/managedocs/LibraryPage.tsx';
 import UploadForApprovalPage from './pages/dashboard/main/managedocs/UploadForApprovalPage.tsx';
@@ -39,22 +37,43 @@ import UploadDocumentPage from './pages/dashboard/main/managedocs/UploadDocument
 import EditDocumentPage from './pages/dashboard/main/managedocs/EditDocumentPage.tsx';
 import AdminApprovalPage from './pages/dashboard/main/managedocs/AdminApprovalPage.tsx';
 
+// --- SUPPORT TICKET COMPONENTS (NEW/UPDATED) ---
+import { SupportTicketList } from './components/tickets/SupportTicketList.tsx';
+import { UserTicketPage } from './pages/dashboard/main/Tickets/UserTicketPage.tsx';
+import { AdminTicketPage } from './pages/dashboard/main/Tickets/AdminTicketPage.tsx';
+
 // --- Placeholder Components for General Routes ---
-// This is your component for the main dashboard overview
-const DashboardPage = () => <div className="p-6"><h1>Dashboard Overview</h1><p>Welcome! This is your main dashboard view.</p></div>;
-const UserProfilePage = () => <div className="p-6"><h1>My Profile</h1></div>;
+//const DashboardPage = () => <div className="p-6"><h1>Dashboard Overview</h1><p>Welcome! This is your main dashboard view.</p></div>;
+//dashboardoverview
+import DashboardPage from './pages/dashboard/DashboardPage.tsx';
+import UserProfilePage from './pages/dashboard/main/Profile.tsx';
 const SettingsPage = () => <div className="p-6"><h1>Settings</h1></div>;
-const LogoutComponent = () => <div className="p-6"><h1>Logging out...</h1></div>;
+import LogoutComponent from './components/logout/logout.tsx';
+
+
+// ===================================================================
+// --- NEW: ARTICLE & ADMIN PAGE IMPORTS ---
+// ===================================================================
+import ArticleListPage from './pages/dashboard/main/articles/ArticleListPage.tsx';
+import ArticleDetailPage from './pages/dashboard/main/articles/ArticleDetailPage.tsx';
+import CreateArticlePage from './pages/dashboard/main/articles/CreateArticlePage.tsx';
+import EditArticlePage from './pages/dashboard/main/articles/EditArticlePage.tsx';
+import AdminDashboardPage from './pages/dashboard/main/articles/AdminDashboardPage.tsx';
+import AuthenticatedRoute from './components/auth/AuthenticatedRoute.tsx';
+import ProtectedRoute from './components/auth/ProtectedRoute.tsx';
+// ===================================================================
+
 
 // ===================================================================
 // --- FINAL @MWALIMU APP ROUTER DEFINITION ---
 // ===================================================================
 const router = createBrowserRouter([
-  // Standalone Routes
+  // Standalone Routes (NO CHANGES HERE)
   { path: 'register', element: <Register />, errorElement: <Error /> },
   { path: 'login', element: <Login />, errorElement: <Error /> },
   { path: 'account', element: <Account />, errorElement: <Error /> },
-  // Public-Facing Routes
+  
+  // Public-Facing Routes (ADDED PUBLIC ARTICLE ROUTES)
   {
     path: '/',
     element: <AppLayout />,
@@ -63,19 +82,53 @@ const router = createBrowserRouter([
       { index: true, element: <Home /> },
       { path: 'documents', element: <AllDocumentsPage /> },
       { path: 'featured', element: <FeaturedDocumentsPage /> },
-      //{ path: 'documents/:documentId', element: <DocumentDetailPage /> },
+      
+      // --- NEWLY ADDED PUBLIC ARTICLE ROUTES ---
+      { path: 'articles', element: <ArticleListPage /> },
+      { path: 'articles/:slug', element: <ArticleDetailPage /> },
     ],
   },
 
-  // Authenticated Dashboard Routes
+  // ===================================================================
+  // --- NEW: PROTECTED ROUTES FOR ARTICLE MANAGEMENT ---
+  // ===================================================================
+  // Authenticated-Only Routes (for creating/editing articles)
+  {
+    element: <AuthenticatedRoute />,
+    errorElement: <Error />,
+    children: [
+      {
+        element: <AppLayout />, // Use the public-facing layout for a consistent feel
+        children: [
+          { path: 'articles/create', element: <CreateArticlePage /> },
+          { path: 'articles/edit/:slug', element: <EditArticlePage /> },
+        ]
+      }
+    ]
+  },
+  // Admin-Only Routes (for managing categories in the admin dashboard)
+  {
+    element: <ProtectedRoute />,
+    errorElement: <Error />,
+    children: [
+      {
+        element: <DashboardLayout />, // Use the dashboard layout for the admin area
+        children: [
+            { path: 'admin/dashboard', element: <AdminDashboardPage /> },
+        ]
+      }
+    ]
+  },
+  // ===================================================================
+
+  // Authenticated Dashboard Routes (NO CHANGES HERE)
   {
     path: '/dashboard',
     element: <DashboardLayout />,
     errorElement: <Error />,
     children: [
       // User Routes
-      { index: true, element: <DashboardPage /> },
-      //{ path: 'my-library', element: <MyLibraryPage /> },
+      { index: true, element: <DashboardPage  /> },
       { path: 'cart', element: <CartPage /> },
       { path: 'upload-for-approval', element: <UploadForApprovalPage /> },
       
@@ -90,23 +143,25 @@ const router = createBrowserRouter([
       { path: 'admin/documents/edit/:documentId', element: <EditDocumentPage /> },
       { path: 'accounts', element: <Account />, errorElement: <Error /> },
       
+      // --- SUPPORT TICKET ROUTES (NEW/UPDATED) ---
+      { path: 'support-tickets', element: <SupportTicketList isAdmin={false} /> },
+      { path: 'support-tickets/:id', element: <UserTicketPage /> },
+      { path: 'admin/support-tickets', element: <SupportTicketList isAdmin={true} /> },
+      { path: 'admin/support-tickets/:id', element: <AdminTicketPage /> },
+      
       // General Routes
       { path: 'profile', element: <UserProfilePage /> },
       { path: 'settings', element: <SettingsPage /> },
       { path: 'logout', element: <LogoutComponent /> },
-       { path: 'documents', element: <AllDocumentsPage /> },
-
-      // Shared detail page route
-      //{ path: 'documents/:documentId', element: <DocumentDetailPage /> },
     ],
   },
 
-  // Fallback Route
+  // Fallback Route (NO CHANGES HERE)
   { path: '*', element: <Error /> }
 ]);
 
 // ===================================================================
-// --- MAIN RENDER FUNCTION ---
+// --- MAIN RENDER FUNCTION --- (NO CHANGES HERE)
 // ===================================================================
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -121,6 +176,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     </Provider>
   </React.StrictMode>
 );
+
+// --- PWA SERVICE WORKER REGISTRATION --- (NO CHANGES HERE)
+// ... (code remains the same)
 
 // ===================================================================
 // --- PWA SERVICE WORKER REGISTRATION ---

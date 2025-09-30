@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { logOut } from '../../features/users/userSlice'; 
+import { logOut } from '../../features/users/userSlice';
 
 
 const SunIcon: React.FC<{ className?: string }> = ({ className = "w-6 h-6" }) => (
@@ -42,12 +42,12 @@ const SpinnerIcon: React.FC<{ className?: string }> = ({ className = "w-5 h-5" }
 
 // Logout Icon
 const LogoutIcon: React.FC<{ className?: string }> = ({ className = "w-6 h-6" }) => (
-  <svg 
-    xmlns="http://www.w3.org/2000/svg" 
-    fill="none" 
-    viewBox="0 0 24 24" 
-    strokeWidth={1.5} 
-    stroke="currentColor" 
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={1.5}
+    stroke="currentColor"
     className={className}
   >
     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
@@ -61,9 +61,9 @@ const Logout: React.FC = () => {
   const navigate = useNavigate();
 
   const [theme, setTheme] = useState(() => {
-    if (typeof window !== 'undefined') { 
+    if (typeof window !== 'undefined') {
       const savedTheme = localStorage.getItem('theme');
-      
+
       // Default to 'dark' if no preference or if system preference cannot be determined.
       if (savedTheme) return savedTheme;
       if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -88,22 +88,37 @@ const Logout: React.FC = () => {
     setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setIsLoggingOut(true);
-    dispatch(logOut());
-    localStorage.removeItem('authToken'); 
-    sessionStorage.removeItem('authToken');
-    document.cookie = 'authToken=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
 
-    setTimeout(() => {
-      navigate('/login');
-    }, 2000);
+    try {
+      const authToken = localStorage.getItem('authToken');
+      await fetch('/api/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`,
+        },
+      });
+    } catch (error) {
+      console.error('Logout failed:', error);
+    } finally {
+      dispatch(logOut());
+      localStorage.removeItem('authToken');
+      sessionStorage.removeItem('authToken');
+      document.cookie = 'authToken=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
+
+      setTimeout(() => {
+        setIsLoggingOut(false);
+        navigate('/login');
+      }, 2000);
+    }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen 
+    <div className="flex justify-center items-center min-h-screen
                    bg-gradient-to-br from-slate-100 via-sky-100 to-slate-100
-                   dark:from-slate-900 dark:via-purple-900 dark:to-slate-900 
+                   dark:from-slate-900 dark:via-purple-900 dark:to-slate-900
                    p-4 sm:p-6 relative overflow-hidden transition-colors duration-500"
     >
       {/* Optional: Subtle animated background elements for dark mode */}
@@ -121,7 +136,7 @@ const Logout: React.FC = () => {
           bg-white bg-opacity-70 backdrop-blur-lg border border-slate-300 text-slate-800
           dark:bg-slate-800 dark:bg-opacity-50 dark:border-slate-700 dark:text-slate-100
           p-6 sm:p-10 rounded-xl shadow-xl dark:shadow-2xl dark:shadow-purple-500/30
-          w-full max-w-lg 
+          w-full max-w-lg
           relative transition-all duration-500
         "
       >
@@ -141,11 +156,11 @@ const Logout: React.FC = () => {
         </button>
 
         {/* Fancy corner accent - themed */}
-        <div className="absolute -top-2 -left-2 w-12 h-12 border-t-2 border-l-2 rounded-tl-xl 
-                       border-sky-500 dark:border-purple-500 
+        <div className="absolute -top-2 -left-2 w-12 h-12 border-t-2 border-l-2 rounded-tl-xl
+                       border-sky-500 dark:border-purple-500
                        animate-pulse transition-colors duration-500"></div>
-        <div className="absolute -bottom-2 -right-2 w-12 h-12 border-b-2 border-r-2 rounded-br-xl 
-                       border-pink-400 dark:border-pink-500 
+        <div className="absolute -bottom-2 -right-2 w-12 h-12 border-b-2 border-r-2 rounded-br-xl
+                       border-pink-400 dark:border-pink-500
                        animate-pulse animation-delay-1000 transition-colors duration-500"></div>
 
 
@@ -154,10 +169,10 @@ const Logout: React.FC = () => {
             <LogoutIcon className="w-16 h-16 text-sky-600 dark:text-purple-400 transition-colors duration-500" />
           </div>
 
-          <h2 
+          <h2
             className="
               text-3xl sm:text-4xl font-bold mb-4
-              text-transparent bg-clip-text 
+              text-transparent bg-clip-text
               bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600
               dark:from-purple-400 dark:via-pink-500 dark:to-orange-400
             "
@@ -178,7 +193,7 @@ const Logout: React.FC = () => {
               w-full sm:w-auto flex items-center justify-center
               px-8 py-3 mb-4
               bg-gradient-to-r from-red-500 via-red-600 to-red-700
-              text-white text-lg font-semibold 
+              text-white text-lg font-semibold
               rounded-lg shadow-md hover:shadow-lg hover:shadow-red-500/50
               transform hover:scale-105 transition-all duration-300 ease-in-out
               focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75
@@ -204,8 +219,8 @@ const Logout: React.FC = () => {
               <button
                 onClick={() => navigate(-1)}
                 className="
-                  text-sky-600 hover:text-sky-700 
-                  dark:text-purple-400 dark:hover:text-purple-300 
+                  text-sky-600 hover:text-sky-700
+                  dark:text-purple-400 dark:hover:text-purple-300
                   font-medium transition-colors duration-200
                   hover:underline
                 "
@@ -222,14 +237,14 @@ const Logout: React.FC = () => {
             "The only way to do great work is to love what you do. If you haven't found it yet, keep looking. Don't settle." – Steve Jobs
           </p>
         </div>
-        
+
         {/* Animated Progress Bar during logout */}
         {isLoggingOut && (
           <div className="w-full bg-slate-300 dark:bg-slate-700 rounded-full h-1.5 mt-8 overflow-hidden transition-colors duration-500">
-            <div 
-              className="bg-gradient-to-r 
+            <div
+              className="bg-gradient-to-r
                          from-sky-500 to-blue-600
-                         dark:from-purple-500 dark:to-pink-500 
+                         dark:from-purple-500 dark:to-pink-500
                          h-1.5 rounded-full animate-logout-progress"
               style={{ width: '100%' }}
             ></div>

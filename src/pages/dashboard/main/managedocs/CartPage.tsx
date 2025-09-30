@@ -35,6 +35,9 @@ const CartPage: React.FC = () => {
 
   const itemsToDisplay = isCheckoutSuccess ? purchasedItems : cartItems;
 
+  // Infer the type of a cart item from the cartItems array
+  type CartItemType = typeof cartItems extends (infer U)[] ? U : never;
+
   return (
     <>
       <div className="bg-slate-50 min-h-screen">
@@ -85,9 +88,9 @@ const CartPage: React.FC = () => {
               </Link>
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-3 sm:gap-4">
+            <div>
               <AnimatePresence>
-                {itemsToDisplay.map((item) => (
+                {itemsToDisplay.map((item: CartItemType) => (
                   <CartItem
                     key={item.documentId}
                     item={item}
@@ -120,7 +123,7 @@ const CartPage: React.FC = () => {
         isOpen={isPaymentModalOpen}
         onClose={() => setPaymentModalOpen(false)}
         onPaymentSuccess={handlePaymentSuccess}
-        documentIds={cartItems.map(item => item.documentId)}
+        documentIds={cartItems.map((item: CartItemType) => item.documentId)}
       />
     </>
   );

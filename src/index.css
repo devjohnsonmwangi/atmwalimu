@@ -8,6 +8,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* In your global CSS file, e.g., src/index.css */
+@import 'react-quill/dist/quill.snow.css'; 
+
+/* Optional: Add some custom styling to make it fit better */
+.ql-editor {
+  min-height: 300px;
+  font-size: 1.125rem; /* 18px */
+}
+
 /* --- 3. Base App Styles --- */
 @layer base {
   body {

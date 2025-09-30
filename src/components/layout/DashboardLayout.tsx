@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Header from './Header'; 
 import AppDrawer from '../../pages/dashboard/aside/Drawer';
+// --- 1. IMPORT THE HISTORY TRACKER ---
+// Make sure this path is correct for your project structure.
+import HistoryTracker from '../../components/RouteChangeTracker';
 
 /**
  * DashboardLayout Component (Flexbox Version)
@@ -21,6 +24,14 @@ const DashboardLayout = () => {
 
   return (
     <div className="min-h-screen bg-base-200/50">
+      {/* 
+        --- 2. PLACE THE HISTORY TRACKER HERE ---
+        This component has no visible UI (it returns null).
+        Placing it here ensures it's always rendered within the router's context,
+        allowing it to track navigation for any page that uses this layout.
+      */}
+      <HistoryTracker />
+
       {/* 
         The Header is now a top-level component. Since it has `position: fixed`,
         it will always be rendered at the top of the screen, full-width.

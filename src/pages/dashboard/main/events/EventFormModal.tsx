@@ -24,7 +24,7 @@ import {
   useFetchCasesQuery,
   useGetCasesByClientOwnerQuery,
   CaseDataTypes,
-} from '../../../../features/case/caseAPI';
+} from '../../../../features/articles/articlesApi';
 
 // --- TYPE DEFINITIONS ---
 type AppEventType = 'meeting' | 'hearing' | 'consultation' | 'reminder' | 'court_date';

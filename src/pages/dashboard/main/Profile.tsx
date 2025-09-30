@@ -1,563 +1,371 @@
-// src/pages/dashboard/main/Profile.tsx (or ProfileWithModal.tsx)
-import React, { ReactNode, useEffect, useState, ChangeEvent } from 'react';
-import { useForm, SubmitHandler, FieldError } from 'react-hook-form';
-import { Link } from 'react-router-dom';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
+// src/features/users/UserProfile.tsx
+
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { usersAPI } from '../../../features/users/usersAPI';
-import { Toaster, toast } from 'sonner';
-import axios from 'axios';
-//import Footer from '../../landingPage/Footer';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../../app/store';
-import {
-    FaTimes,
-    FaPhoneAlt,
-    FaEnvelope,
-    FaMapMarkerAlt,
-    FaUserCircle,
-    FaEdit,
-    FaArrowLeft,
-    FaCamera,
-    FaSpinner,
-    FaExclamationCircle,
-    FaSun,
-    FaMoon
-} from 'react-icons/fa';
+import toast, { Toaster } from 'react-hot-toast';
+import { Camera, Linkedin, Loader2, LogIn, Twitter } from 'lucide-react';
 
-// ======= Modal Component =======
-interface ModalProps {
-    title: string;
-    children: ReactNode;
-    onClose: () => void;
-    isOpen: boolean;
+// --- Redux & API Imports ---
+import { useAppSelector } from '../../../app/hooks';
+import { selectCurrentUser, selectIsAuthenticated } from '../../../features/users/userSlice';
+import { useGetUserByIdQuery, useUpdateUserMutation, UserUpdatePayload} from '../../../features/users/usersAPI';
+import { ProfileSkeleton } from '../../../components/skeltons/ProfileSkeleton';
+
+// --- Cloudinary Configuration ---
+// Recommended: Move to environment variables for production
+const CLOUDINARY_CLOUD_NAME = 'dw4hohfsr'; // Replace with your Cloudinary cloud name
+const CLOUDINARY_UPLOAD_PRESET = 'johnson'; // Replace with your Cloudinary upload preset
+
+// --- Type Definitions ---
+interface User {
+  fullName: string;
+  email: string;
+  bio?: string;
+  profilePictureUrl?: string | null;
+  socialLinks?: {
+    twitter?: string;
+    linkedIn?: string;
+  };
 }
 
-const Modal: React.FC<ModalProps> = ({ title, children, onClose, isOpen }) => {
-    useEffect(() => {
-        if (!isOpen) return;
+interface ProfileHeaderProps {
+  user: User;
+  imagePreview: string | null;
+  onImageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  fileInputRef: React.RefObject<HTMLInputElement>;
+}
 
-        const handleEsc = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') {
-                onClose();
-            }
-        };
-        window.addEventListener('keydown', handleEsc);
-        document.body.style.overflow = 'hidden';
+interface ProfileFormProps {
+  fullName: string;
+  setFullName: React.Dispatch<React.SetStateAction<string>>;
+  bio: string;
+  setBio: React.Dispatch<React.SetStateAction<string>>;
+}
 
-        return () => {
-            window.removeEventListener('keydown', handleEsc);
-            document.body.style.overflow = 'auto';
-        };
-    }, [isOpen, onClose]);
+interface SocialLinksFormProps {
+  socialLinks: { twitter: string; linkedIn: string };
+  handleSocialLinkChange: (platform: 'twitter' | 'linkedIn', value: string) => void;
+}
 
-    if (!isOpen) return null;
-
-    return (
-        <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-60 dark:bg-opacity-75 backdrop-blur-sm transition-opacity duration-300 ease-in-out"
-            onClick={onClose}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="modal-title"
-        >
-            <div
-                className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto transform transition-all duration-300 ease-in-out scale-95 opacity-0 animate-modalEnter p-6 sm:p-8"
-                onClick={(e) => e.stopPropagation()}
-            >
-                <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
-                    <h3 id="modal-title" className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-gray-100">{title}</h3>
-                    <button
-                        onClick={onClose}
-                        className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
-                        aria-label="Close modal"
-                    >
-                        <FaTimes className="h-5 w-5" />
-                    </button>
-                </div>
-                <div>{children}</div>
-            </div>
-        </div>
-    );
-};
-// ======= End of Modal Component =======
-
-interface ApiErrorData {
-    issues?: { [key: string]: string[] | string };
-    error?: string;
-    msg?: string;
+// Type for RTK Query error objects for safer error handling
+interface ApiError {
+  data?: {
     message?: string;
+  };
 }
 
-// ======= Profile Component =======
-type UserFormData = {
-    full_name: string;
-    email: string;
-    phone_number: string;
-    address: string;
-    profile_picture?: string;
-};
 
-const schema = yup.object().shape({
-    full_name: yup.string().required('Full name is required'),
-    email: yup.string().email('Invalid email address').required('Email is required'),
-    phone_number: yup.string().required('Phone number is required'),
-    address: yup.string().required('Address is required'),
-    profile_picture: yup.string().optional(),
-});
+// --- Reusable UI Components ---
 
-const renderFormField = (
-    id: keyof UserFormData,
-    label: string,
-    type: string,
-    autoComplete: string,
-    error: FieldError | undefined,
-    register: ReturnType<typeof useForm<UserFormData>>['register'],
-    icon?: React.ReactNode,
-    inputProps?: React.InputHTMLAttributes<HTMLInputElement>
-) => (
-    <div>
-        <label htmlFor={id} className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            {label}
-        </label>
-        <div className="relative rounded-md shadow-sm">
-            {icon && (
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    {React.cloneElement(icon as React.ReactElement, { className: "h-5 w-5 text-gray-400 dark:text-gray-500" })}
-                </div>
-            )}
-            <input
-                id={id}
-                type={type}
-                autoComplete={autoComplete}
-                className={`appearance-none block w-full px-3 py-2 border ${icon ? 'pl-10' : ''} 
-                    ${error 
-                        ? 'border-red-500 focus:ring-red-500 focus:border-red-500 dark:border-red-600 dark:focus:ring-red-500 dark:focus:border-red-500' 
-                        : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-600 dark:focus:ring-indigo-400 dark:focus:border-indigo-400'
-                    } 
-                    rounded-md placeholder-gray-400 dark:placeholder-gray-500 
-                    focus:outline-none sm:text-sm 
-                    bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100
-                    ${inputProps?.disabled ? (inputProps.className || 'bg-gray-100 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed') : ''}`}
-                placeholder={`Enter your ${label.toLowerCase()}`}
-                {...register(id)}
-                {...inputProps}
-            />
+const PageHeader = () => (
+  <div className="text-center py-4">
+    <h1 
+        className="relative inline-block text-4xl md:text-5xl font-extrabold text-blue-600 dark:text-blue-400 mb-3 transition-colors duration-300
+                   after:content-[''] after:absolute after:w-0 after:h-1 after:block after:bg-green-500 after:transition-all after:duration-300
+                   hover:after:w-full after:left-0 after:bottom-0"
+    >
+      Manage Your Profile
+    </h1>
+    <p className="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
+      This is your personal space. Keep your details, bio, and social links updated so others can get to know you better.
+    </p>
+  </div>
+);
+
+const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, imagePreview, onImageChange, fileInputRef }) => (
+    <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-800 dark:via-gray-900 dark:to-black p-8 shadow-md transition-all duration-300 ease-in-out hover:shadow-lg">
+      <div className="absolute -top-10 -right-10 w-40 h-40 bg-purple-200 dark:bg-purple-900 rounded-full opacity-20 animate-pulse"></div>
+      <div className="absolute -bottom-12 -left-12 w-32 h-32 bg-pink-200 dark:bg-pink-900 rounded-full opacity-20 animate-pulse delay-75"></div>
+      <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-8">
+        <div className="relative group w-40 h-40 flex-shrink-0">
+          <img
+            src={imagePreview || `https://ui-avatars.com/api/?name=${user.fullName.replace(/\s/g, '+')}&background=random&color=fff&font-size=0.5`}
+            alt="Profile"
+            className="w-full h-full rounded-full object-cover border-4 border-white dark:border-gray-800 shadow-lg transition-transform duration-300 group-hover:scale-105"
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 flex items-center justify-center rounded-full transition-all duration-300 cursor-pointer"
+            aria-label="Change profile picture"
+          >
+            <Camera className="h-8 w-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform group-hover:scale-110" />
+          </button>
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={onImageChange}
+            accept="image/png, image/jpeg"
+            className="hidden"
+          />
         </div>
-        {error && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{error.message}</p>}
+        <div className="w-full text-center md:text-left pt-4">
+          <h2 className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 mb-2">
+            {user.fullName}
+          </h2>
+          <p className="text-lg text-gray-600 dark:text-gray-400">{user.email}</p>
+        </div>
+      </div>
     </div>
+  );
+
+const ProfileForm: React.FC<ProfileFormProps> = ({ fullName, setFullName, bio, setBio }) => (
+  <div className="space-y-6">
+    <div>
+      <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+        Full Name
+      </label>
+      <input
+        type="text"
+        id="fullName"
+        value={fullName}
+        onChange={(e) => setFullName(e.target.value)}
+        className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm text-gray-900 dark:text-white"
+      />
+    </div>
+    <div>
+      <label htmlFor="bio" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+        Bio
+      </label>
+      <textarea
+        id="bio"
+        value={bio}
+        onChange={(e) => setBio(e.target.value)}
+        rows={4}
+        placeholder="Tell us a little about yourself"
+        className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm text-gray-900 dark:text-white"
+      />
+    </div>
+  </div>
+);
+
+const SocialLinksForm: React.FC<SocialLinksFormProps> = ({ socialLinks, handleSocialLinkChange }) => (
+  <div className="space-y-4">
+    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+      Social Links
+    </label>
+    <div className="relative">
+      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+        <Twitter className="h-5 w-5 text-gray-400" aria-hidden="true" />
+      </div>
+      <input
+        type="text"
+        value={socialLinks.twitter}
+        onChange={(e) => handleSocialLinkChange('twitter', e.target.value)}
+        placeholder="https://twitter.com/your_handle"
+        className="block w-full rounded-md border-0 py-2.5 pl-10 text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm"
+      />
+    </div>
+    <div className="relative">
+      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+        <Linkedin className="h-5 w-5 text-gray-400" aria-hidden="true" />
+      </div>
+      <input
+        type="text"
+        value={socialLinks.linkedIn}
+        onChange={(e) => handleSocialLinkChange('linkedIn', e.target.value)}
+        placeholder="https://linkedin.com/in/your-profile"
+        className="block w-full rounded-md border-0 py-2.5 pl-10 text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm"
+      />
+    </div>
+  </div>
 );
 
 
-const Profile = () => {
-    const navigate = useNavigate();
-    const userState = useSelector((state: RootState) => state.user);
-    const user_id = userState.user?.user_id ?? 0;
+// --- Main Page Component ---
 
-    const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
-        if (typeof window !== 'undefined') {
-            const savedMode = localStorage.getItem('darkMode');
-            if (savedMode !== null) {
-                return savedMode === 'true';
-            }
-        }
-        return true; // Default to dark mode
-    });
+const UserProfile = () => {
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        if (isDarkMode) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-        if (typeof window !== 'undefined') {
-            localStorage.setItem('darkMode', String(isDarkMode));
-        }
-    }, [isDarkMode]);
+  // --- Redux State & API Hooks ---
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const currentUser = useAppSelector(selectCurrentUser);
+  const loggedInUserId = currentUser?.userId;
+  const { data: user, isLoading, isError, refetch } = useGetUserByIdQuery(loggedInUserId!, { skip: !loggedInUserId });
+  const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
 
-    const toggleDarkMode = () => {
-        setIsDarkMode(prevMode => !prevMode);
-    };
+  // --- Component State ---
+  const [fullName, setFullName] = useState('');
+  const [bio, setBio] = useState('');
+  const [socialLinks, setSocialLinks] = useState({ twitter: '', linkedIn: '' });
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // --- Effects ---
+  useEffect(() => {
+    if (user) {
+      setFullName(user.fullName || '');
+      setBio(user.bio || '');
+      setImagePreview(user.profilePictureUrl || null);
+      setSocialLinks({
+        twitter: user.socialLinks?.twitter || '',
+        linkedIn: user.socialLinks?.linkedIn || '',
+      });
+    }
+  }, [user]);
 
-    const { data: userData, isLoading, error: queryError, refetch } = usersAPI.useGetUserByIdQuery(user_id, {
-        pollingInterval: 60000,
-        refetchOnMountOrArgChange: true,
-        skip: !user_id,
-    });
+  // --- Handlers ---
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) { // 2MB size limit
+        toast.error("File is too large. Please select an image under 2MB.");
+        return;
+      }
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => { setImagePreview(reader.result as string); };
+      reader.readAsDataURL(file);
+    }
+  };
 
-    const [updateUser, { isLoading: isUpdatingProfile }] = usersAPI.useUpdateUserMutation();
+  const handleImageUpload = async (): Promise<string | null> => {
+    if (!imageFile) return null;
 
-    const [isEditMode, setIsEditMode] = useState(false);
-    const [imageFile, setImageFile] = useState<File | null>(null);
-    const [imagePreview, setImagePreview] = useState<string | null>(null);
-    const [isViewPicture, setIsViewPicture] = useState(false);
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append('file', imageFile);
+    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
 
-    const { register, handleSubmit, formState: { errors }, reset } = useForm<UserFormData>({
-        resolver: yupResolver(schema),
-        defaultValues: {
-            full_name: '',
-            email: '',
-            phone_number: '',
-            address: '',
-            profile_picture: '',
-        }
-    });
+    try {
+      const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, { method: 'POST', body: formData });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error.message || 'Upload failed');
+      return data.secure_url;
+    } catch (error) {
+      console.error("❌ Image upload failed:", error);
+      toast.error('Image upload failed.');
+      return null;
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
-    useEffect(() => {
-        if (userData) {
-            reset({
-                full_name: userData.full_name,
-                email: userData.email,
-                phone_number: userData.phone_number || '',
-                address: userData.address || '',
-                profile_picture: userData.profile_picture || '',
-            });
-            if (!imageFile && userData.profile_picture) {
-                 setImagePreview(userData.profile_picture);
-            } else if (!imageFile && !userData.profile_picture) {
-                 setImagePreview(null);
-            }
-        }
-    }, [userData, reset, imageFile]);
+  const handleSocialLinkChange = (platform: 'twitter' | 'linkedIn', value: string) => {
+    setSocialLinks(prev => ({ ...prev, [platform]: value }));
+  };
 
-    const handleImageUpload = (event: ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (file) {
-            setImageFile(file);
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setImagePreview(reader.result as string);
-            };
-            reader.readAsDataURL(file);
-        } else {
-            setImageFile(null);
-            setImagePreview(userData?.profile_picture || null);
-        }
-    };
-
-    const onSubmitProfile: SubmitHandler<UserFormData> = async (formData) => {
-        let toastId: string | number | undefined = undefined;
-        try {
-            toastId = toast.loading('Updating profile...');
-            
-            let finalProfilePictureValue: string | null;
-
-            if (imageFile) {
-                const formImageData = new FormData();
-                formImageData.append('file', imageFile);
-                formImageData.append('upload_preset', 'upload'); 
-
-                const response = await axios.post(
-                    `https://api.cloudinary.com/v1_1/dl3ovuqjn/image/upload`, 
-                    formImageData
-                );
-
-                if (response.status === 200 && response.data.secure_url && typeof response.data.secure_url === 'string') {
-                    finalProfilePictureValue = response.data.secure_url;
-                } else {
-                    console.error("Cloudinary upload failed or returned invalid data:", response.data);
-                    throw new Error('Failed to upload new profile picture. Cloudinary did not return a valid URL.');
-                }
-            } else {
-                finalProfilePictureValue = (userData?.profile_picture && userData.profile_picture.trim() !== "") ? userData.profile_picture : null;
-            }
-            
-            const updatePayload = { 
-                user_id: user_id, 
-                full_name: formData.full_name,
-                phone_number: formData.phone_number,
-                address: formData.address,
-                profile_picture: finalProfilePictureValue 
-            };
-            
-            await updateUser(updatePayload).unwrap();
-            
-            setIsEditMode(false);
-            setImageFile(null); 
-            await refetch(); 
-            toast.success('Profile updated successfully!', { id: toastId });
-        } catch (err: unknown) {
-            console.error('Error updating profile:', err);
-            let errorMessage = 'Failed to update profile.';
-            if (axios.isAxiosError(err) && err.response?.data) {
-                const errorData = err.response.data as ApiErrorData;
-                if (errorData.issues && typeof errorData.issues === 'object') { 
-                    const issueMessages = Object.entries(errorData.issues)
-                        .map(([key, value]) => `${key}: ${(Array.isArray(value) ? value.join(', ') : String(value))}`)
-                        .join('; ');
-                    errorMessage = `Validation error: ${issueMessages}`;
-                } else if (typeof errorData.error === 'string') {
-                    errorMessage = errorData.error;
-                } else if (typeof errorData.msg === 'string') {
-                    errorMessage = errorData.msg;
-                } else if (typeof errorData.message === 'string') {
-                    errorMessage = errorData.message;
-                }
-            } else if (err instanceof Error) {
-                errorMessage = err.message;
-            }
-            toast.error(errorMessage, { id: toastId });
-        }
-    };
-    
-    const openEditModal = () => {
-        if (userData) { 
-            setIsEditMode(true);
-            reset({ 
-                full_name: userData.full_name,
-                email: userData.email,
-                phone_number: userData.phone_number || '',
-                address: userData.address || '',
-                profile_picture: userData.profile_picture || '',
-            });
-            setImagePreview(userData.profile_picture || null); 
-            setImageFile(null); 
-        } else {
-            toast.error("User data is not available to edit profile.");
-        }
-    };
-
-    const closeModalAndResetEditModal = () => {
-        setIsEditMode(false);
-    };
-
-    type QueryErrorType = {
-        data?: ApiErrorData; 
-        status?: string | number;
-    };
-
-    // Loading state: Show full page loader. Toggle button is not shown here.
-    if (isLoading && !userData) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 p-4">
-                <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg text-center">
-                    <FaSpinner className="animate-spin h-10 w-10 text-indigo-600 dark:text-indigo-400 mx-auto mb-4" />
-                    <p className="text-lg font-medium text-gray-700 dark:text-gray-300">Loading your profile...</p>
-                </div>
-            </div>
-        );
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!loggedInUserId) {
+      toast.error("Authentication error. Please log in again.");
+      return;
     }
 
-    let displayQueryErrorMessage: string | null = null;
-    if (queryError) {
-        const err = queryError as QueryErrorType;
-        displayQueryErrorMessage = 'An unknown error occurred while fetching profile data.'; 
-        
-        if (err.data) {
-            displayQueryErrorMessage = err.data.message || err.data.error || err.data.msg || `Server error: ${err.status || 'Details unavailable'}`;
-        } else if (err.status) {
-            displayQueryErrorMessage = `Error fetching data: Status ${err.status}`;
-        }
-    }
-    
-    // No User Data state: Show full page message. Toggle button is not shown here.
-    if (!userData && !isLoading && !queryError) {
-        return (
-             <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 p-4">
-                <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg text-center">
-                     <FaUserCircle className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-                    <p className="text-lg font-medium text-gray-700 dark:text-gray-300">No user data available.</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">This might happen if the user ID is invalid, the user doesn't exist, or the query was skipped. Please try again later or contact support.</p>
-                </div>
-            </div>
-        );
-    }
-    
-    const displayProfilePicSrc = imagePreview || userData?.profile_picture || "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg";
+    const loadingToast = toast.loading('Saving your profile...');
+    let profilePictureUrl = user?.profilePictureUrl;
 
+    if (imageFile) {
+      const cloudinaryUrl = await handleImageUpload();
+      if (cloudinaryUrl) {
+        profilePictureUrl = cloudinaryUrl;
+      } else {
+        toast.dismiss(loadingToast);
+        return;
+      }
+    }
+    
+    const updatePayload: UserUpdatePayload = {
+        fullName,
+        bio,
+        profilePictureUrl: profilePictureUrl ?? undefined,
+        socialLinks,
+    };
+    
+    try {
+      await updateUser({ userId: loggedInUserId, ...updatePayload }).unwrap();
+      toast.dismiss(loadingToast);
+      toast.success('Profile updated successfully!');
+      refetch();
+    } catch (err) {
+      toast.dismiss(loadingToast);
+      const apiError = err as ApiError;
+      const errorMessage = apiError.data?.message || 'Update failed. Please try again.';
+      toast.error(errorMessage);
+      console.error("❌ Profile update failed:", err);
+    }
+  };
+
+  // --- Render Logic ---
+  if (!isAuthenticated) {
     return (
-        <>
-            <Toaster richColors position="top-center" theme={isDarkMode ? 'dark' : 'light'} />
-            
-            
-
-            <div className="bg-gray-100 dark:bg-gray-900 min-h-screen py-8 sm:py-12 px-4">
-                <div className="max-w-3xl mx-auto">
-                    {/* Container for Back button and Dark Mode Toggle */}
-                    <div className="flex justify-between items-center mb-6">
-                        <button
-                            onClick={() => navigate(-1)}
-                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 dark:text-indigo-200 dark:bg-indigo-700 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-colors"
-                        >
-                            <FaArrowLeft className="mr-2 h-4 w-4" />
-                            Back
-                        </button>
-
-                        <button
-                            onClick={toggleDarkMode}
-                            className="p-2.5 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-                            aria-label="Toggle dark mode"
-                        >
-                            {isDarkMode ? <FaSun className="h-5 w-5" /> : <FaMoon className="h-5 w-5" />}
-                        </button>
-                    </div>
-
-
-                    {displayQueryErrorMessage && (
-                        <div className="bg-red-100 dark:bg-red-900/[.2] border-l-4 border-red-500 dark:border-red-700 text-red-700 dark:text-red-300 p-4 rounded-md shadow-md mb-6" role="alert">
-                            <div className="flex">
-                                <div className="flex-shrink-0">
-                                    <FaExclamationCircle className="h-5 w-5 text-red-500 dark:text-red-400" aria-hidden="true" />
-                                </div>
-                                <div className="ml-3">
-                                    <h3 className="text-sm font-medium text-red-800 dark:text-red-200">Oops! Something went wrong.</h3>
-                                    <div className="mt-1 text-sm text-red-700 dark:text-red-300">
-                                        <p>{displayQueryErrorMessage}</p>
-                                    </div>
-                                    <div className="mt-3">
-                                        <button
-                                            onClick={() => refetch()}
-                                            className="px-3 py-1.5 bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600 text-white text-xs font-medium rounded-md transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 dark:focus:ring-red-400 focus:ring-offset-2 focus:ring-offset-red-100 dark:focus:ring-offset-red-900/[.2]"
-                                        >
-                                            Try Again
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {userData && (
-                        <div className="bg-white dark:bg-gray-800 shadow-xl rounded-lg p-6 sm:p-10">
-                            <div className="flex flex-col items-center sm:flex-row sm:items-start mb-8 pb-8 border-b border-gray-200 dark:border-gray-700">
-                                <div className="relative mb-4 sm:mb-0 sm:mr-8">
-                                    <img
-                                        src={displayProfilePicSrc}
-                                        className="rounded-full h-32 w-32 sm:h-36 sm:w-36 object-cover border-4 border-white dark:border-gray-800 shadow-lg cursor-pointer transition-transform hover:scale-105"
-                                        alt="User Avatar"
-                                        onClick={() => setIsViewPicture(true)}
-                                    />
-                                </div>
-
-                                <div className="text-center sm:text-left flex-grow">
-                                    <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-gray-100 mb-2">{userData.full_name}</h1>
-                                    <div className="space-y-2 text-gray-600 dark:text-gray-400">
-                                        <p className="flex items-center justify-center sm:justify-start">
-                                            <FaEnvelope className="mr-3 text-indigo-500 dark:text-indigo-400 flex-shrink-0" />
-                                            {userData.email}
-                                        </p>
-                                        <p className="flex items-center justify-center sm:justify-start">
-                                            <FaPhoneAlt className="mr-3 text-indigo-500 dark:text-indigo-400 flex-shrink-0" />
-                                            {userData.phone_number || 'N/A'}
-                                        </p>
-                                        <p className="flex items-center justify-center sm:justify-start">
-                                            <FaMapMarkerAlt className="mr-3 text-indigo-500 dark:text-indigo-400 flex-shrink-0" />
-                                            {userData.address || 'N/A'}
-                                        </p>
-                                    </div>
-                                     <button
-                                        onClick={() => setIsViewPicture(true)}
-                                        className="mt-4 sm:hidden px-4 py-2 text-sm font-medium rounded-md text-indigo-600 dark:text-indigo-300 border border-indigo-600 dark:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-gray-700 transition"
-                                    >
-                                        View Picture
-                                    </button>
-                                </div>
-                                 <button
-                                    onClick={() => setIsViewPicture(true)}
-                                    className="hidden sm:block sm:ml-auto self-start px-4 py-2 text-sm font-medium rounded-md text-indigo-600 dark:text-indigo-300 border border-indigo-600 dark:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-gray-700 transition"
-                                >
-                                    View Picture
-                                </button>
-                            </div>
-
-                            <div className="flex justify-center sm:justify-start">
-                                <button
-                                    onClick={openEditModal}
-                                    className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-colors"
-                                >
-                                    <FaEdit className="mr-2 h-5 w-5" />
-                                    Edit Profile
-                                </button>
-                            </div>
-                        </div>
-                    )}
-                </div>
-
-                {userData && isEditMode && (
-                    <Modal 
-                        title="Update Your Profile" 
-                        isOpen={isEditMode} 
-                        onClose={closeModalAndResetEditModal}
-                    >
-                        <form onSubmit={handleSubmit(onSubmitProfile)} className="space-y-6">
-                            <div className="flex flex-col items-center space-y-3">
-                                <img
-                                    src={imagePreview || userData.profile_picture || "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg"}
-                                    alt="Avatar Preview"
-                                    className="w-32 h-32 rounded-full object-cover shadow-md"
-                                />
-                                <label htmlFor="file-upload-modal" className="cursor-pointer inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                    <FaCamera className="mr-2 h-4 w-4 text-gray-500 dark:text-gray-400"/>
-                                    <span>{imageFile ? imageFile.name.substring(0,20) + (imageFile.name.length > 20 ? '...':'') : "Change Picture"}</span>
-                                    <input id="file-upload-modal" name="profile-picture-upload" type="file" className="sr-only" accept="image/*" onChange={handleImageUpload} />
-                                </label>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">PNG, JPG, GIF up to 10MB</p>
-                            </div>
-
-                            {renderFormField("full_name", "Full Name", "text", "name", errors.full_name, register, <FaUserCircle />)}
-                            {renderFormField("email", "Email Address", "email", "email", errors.email, register, <FaEnvelope />, 
-                                
-                            )}
-                            {renderFormField("phone_number", "Phone Number", "tel", "tel", errors.phone_number, register, <FaPhoneAlt />)}
-                            {renderFormField("address", "Address", "text", "street-address", errors.address, register, <FaMapMarkerAlt />)}
-
-                            <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-3 pt-2">
-                                <button
-                                    type="button"
-                                    onClick={closeModalAndResetEditModal}
-                                    className="mt-3 w-full sm:mt-0 sm:w-auto inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-6 py-2 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="w-full sm:w-auto inline-flex justify-center items-center rounded-md border border-transparent shadow-sm px-6 py-2 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 sm:text-sm disabled:opacity-60 disabled:cursor-not-allowed"
-                                    disabled={isUpdatingProfile}
-                                >
-                                    {isUpdatingProfile && <FaSpinner className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" />}
-                                    {isUpdatingProfile ? 'Saving...' : 'Save Changes'}
-                                </button>
-                            </div>
-                        </form>
-                    </Modal>
-                )}
-
-                {isViewPicture && (
-                    <div 
-                        className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black bg-opacity-60 dark:bg-opacity-75 backdrop-blur-sm transition-opacity duration-300 ease-in-out"
-                        onClick={() => setIsViewPicture(false)}
-                    >
-                        <div 
-                            className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-2 sm:p-4 max-w-md sm:max-w-lg w-full transform transition-all duration-300 ease-in-out scale-95 opacity-0 animate-modalEnter relative"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <img
-                                src={displayProfilePicSrc}
-                                alt="Full User Avatar"
-                                className="rounded-md object-contain w-full max-h-[80vh]"
-                            />
-                            <button
-                                onClick={() => setIsViewPicture(false)}
-                                className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-gray-700 bg-opacity-60 text-white rounded-full p-1.5 hover:bg-opacity-80 dark:bg-gray-600 dark:bg-opacity-70 dark:text-gray-100 dark:hover:bg-opacity-90 transition-colors z-10"
-                                aria-label="Close image view"
-                            >
-                                <FaTimes className="h-5 w-5" />
-                            </button>
-                        </div>
-                    </div>
-                )}
-            </div>
-             <footer className="mt-16 pt-8 border-t border-slate-300 dark:border-slate-700 text-center text-slate-500 dark:text-slate-400 text-sm">
-                      <p>© {new Date().getFullYear()} Wakili Inc. All rights reserved.</p>
-                      <p className="mt-1">
-                        <Link to="/terms" className="hover:text-teal-600 dark:hover:text-teal-400">Terms of Service</Link> | <Link to="/privacy-policy" className="hover:text-teal-600 dark:hover:text-teal-400">Privacy Policy</Link> | <Link to="/contactus" className="hover:text-teal-600 dark:hover:text-teal-400">Contact Us</Link>
-                      </p>
-                    </footer>
-        </>
+      <div className="flex flex-col items-center justify-center h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="text-center p-8 bg-white dark:bg-gray-800 rounded-lg shadow-xl">
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">Authentication Required</h2>
+          <p className="text-gray-600 dark:text-gray-300 mb-6">Please log in to manage your profile.</p>
+          <button onClick={() => navigate('/login')} className="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-6 text-sm font-medium text-white shadow-sm hover:bg-indigo-700">
+            <LogIn className="mr-2 h-4 w-4" /> Go to Login
+          </button>
+        </div>
+      </div>
     );
-};
-// ======= End of Profile Component =======
+  }
 
-export default Profile;
+  if (isLoading) return <ProfileSkeleton />;
+
+  if (isError || !user) {
+    return (
+      <div className="flex items-center justify-center h-screen text-red-500">
+        Error: Could not load profile data. Please try refreshing the page.
+      </div>
+    );
+  }
+
+  const isSaving = isUpdating || isUploading;
+
+  // --- JSX ---
+  return (
+    <div className="bg-gray-50 dark:bg-gray-900 min-h-screen">
+      <Toaster position="top-right" reverseOrder={false} />
+      
+      <header className="sticky top-0 z-20 bg-gray-50/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200/50 dark:border-gray-700/50">
+          <div className="container mx-auto max-w-4xl">
+             <PageHeader />
+          </div>
+      </header>
+
+      <main className="container mx-auto p-4 md:px-8 max-w-4xl">
+        <form onSubmit={handleSubmit} className="space-y-8 mt-4">
+          <ProfileHeader 
+            user={user} 
+            imagePreview={imagePreview} 
+            onImageChange={handleImageChange}
+            fileInputRef={fileInputRef} 
+          />
+          
+          <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 md:p-8">
+            <div className="space-y-6">
+              <ProfileForm 
+                fullName={fullName} 
+                setFullName={setFullName}
+                bio={bio}
+                setBio={setBio}
+              />
+              <SocialLinksForm 
+                socialLinks={socialLinks}
+                handleSocialLinkChange={handleSocialLinkChange}
+              />
+            </div>
+            <div className="flex justify-end mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
+              <button 
+                type="submit" 
+                disabled={isSaving} 
+                className="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-6 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:bg-indigo-400 disabled:cursor-not-allowed"
+              >
+                {isSaving ? (
+                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving...</>
+                ) : (
+                  'Save Changes'
+                )}
+              </button>
+            </div>
+          </div>
+        </form>
+      </main>
+    </div>
+  );
+};
+
+export default UserProfile;
