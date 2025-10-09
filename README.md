@@ -336,6 +336,28 @@ npm run dev
 
 ---
 
+### Vercel deployment notes
+
+This project is a Vite + React SPA. If you deploy to Vercel, avoid Next.js auto-detection (which looks for a `.next` folder). Recommended steps:
+
+1. Ensure `vercel.json` is present (the repo includes one) and has:
+
+```json
+{
+  "builds": [{ "src": "package.json", "use": "@vercel/static-build", "config": { "distDir": "dist" } }],
+  "routes": [{ "src": "\\/(.*)", "dest": "/index.html" }]
+}
+```
+
+2. In Vercel project settings set Build Command to `pnpm build` (or `npm run build`) and Output Directory to `dist`.
+
+3. If you have `next` in dependencies but you don't use Next.js, remove it from `package.json` (this prevents Vercel from detecting Next and expecting `.next` files). Run `pnpm install` locally after updating dependencies.
+
+4. Deploy. Vercel will run your `build` script (`vite build`) and publish the static `dist` folder.
+
+If you want, I can also add a small pre-deploy script to verify `dist/index.html` exists before pushing, or update CI to run `pnpm build` and upload the build artifacts.
+
+
 ## 🚀 Future Enhancements
 🔮 **Advanced AI Features:** Predict case outcomes & suggest legal strategies.  
 📱 **Mobile App:** Dedicated app for advocates & clients.  
