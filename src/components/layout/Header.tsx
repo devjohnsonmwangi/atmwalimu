@@ -89,7 +89,7 @@ const Header = ({ onMobileMenuToggle }: HeaderProps) => {
           )}
 
           <Link to="/" className="flex items-center gap-2.5 group" aria-label="Go to Mwalimu Homepage">
-            <img src="/atmwalimulogo.png" alt="@mwalimu Logo" className="h-8 w-auto transition-transform duration-300 group-hover:scale-110" />
+            <img src="/public/atmwalimulogo.png" alt="@mwalimu Logo" className="h-8 w-auto transition-transform duration-300 group-hover:scale-110" />
             <span className="text-xl font-bold text-base-content transition-colors duration-300 group-hover:text-primary">@mwalimu</span>
           </Link>
           
