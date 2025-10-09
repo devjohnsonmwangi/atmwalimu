@@ -12,6 +12,7 @@ import { twMerge } from 'tailwind-merge';
 import { authApi, LoginFormData, TLoginResponse } from "../../features/login/loginAPI";
 import { setCredentials } from "../../features/users/userSlice";
 import authImage from "../../assets/imageses/loginimageatmwalimu.png";
+import { optimizedSources } from '../../utils/imagePaths';
 
 // --- VALIDATION SCHEMA (UNCHANGED) ---
 const schema = yup.object().shape({
@@ -127,11 +128,11 @@ const Login = () => {
       </nav>
       <div className="min-h-screen flex flex-col lg:flex-row pt-20">
         <div className="relative lg:w-1/2 lg:h-screen flex flex-col items-start justify-start bg-gray-900 p-8">
-          <img
-            src={authImage}
-            alt="A student engaged in learning on the @mwalimu platform"
-            className="w-full h-auto object-contain flex-shrink-0"
-          />
+          <picture className="w-full">
+            <source type="image/avif" srcSet={optimizedSources('src/assets/imageses','loginimageatmwalimu').avifSrcSet} />
+            <source type="image/webp" srcSet={optimizedSources('src/assets/imageses','loginimageatmwalimu').webpSrcSet} />
+            <img src={optimizedSources('src/assets/imageses','loginimageatmwalimu').fallback} onError={(e)=>{ (e.currentTarget as HTMLImageElement).src = authImage }} alt="A student engaged in learning on the @mwalimu platform" className="w-full h-auto object-contain flex-shrink-0" />
+          </picture>
           <div className="absolute bottom-12 left-12 p-4 hidden lg:block">
               <h2 className="text-4xl font-bold text-white leading-tight">Your Journey to Knowledge Starts Here.</h2>
               <p className="text-lg text-white/80 mt-4 max-w-lg">The best resources for Kenyan learners, curated by the community.</p>

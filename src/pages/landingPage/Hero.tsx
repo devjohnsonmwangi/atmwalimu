@@ -9,8 +9,14 @@ import heroImage1 from '../../assets/imageses/communityimageatmwalilimu.png';
 import heroImage2 from '../../assets/imageses/atmwalimuheroimage1.png';
 import heroImage3 from '../../assets/imageses/docmentsimagelibrary.png';
 import heroImage4 from '../../assets/imageses/subscriptionandpaymentstafssatmwalimu.png';
+import { optimizedSources } from '../../utils/imagePaths';
 
-const imageSet = [heroImage1, heroImage2, heroImage3, heroImage4];
+const imageSet = [
+    { importSrc: heroImage1, relDir: 'src/assets/imageses', basename: 'communityimageatmwalilimu' },
+    { importSrc: heroImage2, relDir: 'src/assets/imageses', basename: 'atmwalimuheroimage1' },
+    { importSrc: heroImage3, relDir: 'src/assets/imageses', basename: 'docmentsimagelibrary' },
+    { importSrc: heroImage4, relDir: 'src/assets/imageses', basename: 'subscriptionandpaymentstafssatmwalimu' },
+];
 const themes = ['light', 'dark'] as const;
 type Theme = typeof themes[number];
 
@@ -57,19 +63,31 @@ const Hero: FC<HeroProps> = ({ theme = 'light' }) => {
         </div>
     );
 
-    const ImagePanel: FC<{ images: string[]; className?: string; delay: string; }> = ({ images, className, delay }) => (
+    type ImageItem = {
+        importSrc: string;
+        relDir: string;
+        basename: string;
+    };
+
+    const ImagePanel: FC<{ images: ImageItem[]; className?: string; delay: string; }> = ({ images, className, delay }) => (
          <div
             style={{ perspective: '1000px', transitionDelay: delay }}
             className={`transition-all duration-700 ease-out ${contentLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} ${className}`}
         >
             <div className={`group relative h-full w-full rounded-2xl bg-black overflow-hidden backdrop-blur-2xl shadow-lg transition-transform duration-300 [transform-style:preserve-3d] hover:[transform:rotateX(4deg)_rotateY(-4deg)]`}>
-                {images.map((image, index) => (
+                {images.map((imageObj, index) => (
                     <div key={index} className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out ${index === currentImageIndex ? 'opacity-100' : 'opacity-0'}`}>
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                        <div
-                            className="w-full h-full bg-contain bg-center kenburns-active"
-                            style={{ backgroundImage: `url(${image})` }}
-                        />
+                        <picture className="w-full h-full block">
+                          <source type="image/avif" srcSet={optimizedSources(imageObj.relDir, imageObj.basename).avifSrcSet} />
+                          <source type="image/webp" srcSet={optimizedSources(imageObj.relDir, imageObj.basename).webpSrcSet} />
+                          <img
+                            src={optimizedSources(imageObj.relDir, imageObj.basename).fallback}
+                            onError={(e)=>{ (e.currentTarget as HTMLImageElement).src = imageObj.importSrc }}
+                            alt={`Hero ${index + 1}`}
+                            className="w-full h-full object-cover kenburns-active"
+                          />
+                        </picture>
                     </div>
                 ))}
             </div>

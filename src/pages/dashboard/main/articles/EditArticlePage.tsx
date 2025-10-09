@@ -76,7 +76,7 @@ const EditArticlePage: React.FC = () => {
   };
 
   if (isLoadingArticle) {
-    return <div className="container mx-auto px-0 sm:px-6 lg:px-8 py-8"><ArticleDetailSkeleton /></div>;
+    return <div className="w-full sm:max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8"><ArticleDetailSkeleton /></div>;
   }
 
   if (isError || !article) {
@@ -91,14 +91,14 @@ const EditArticlePage: React.FC = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen">
-      <div className="container mx-auto px-0 sm:px-6 lg:px-8 py-8 md:py-12">
+  <div className="w-full sm:max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
         <header className="mb-8 text-center px-4 sm:px-0">
           <h1 className="text-3xl md:text-4xl font-extrabold text-blue-700 inline-block border-b-4 border-transparent hover:border-green-500 transition-colors duration-300 pb-2">
             Edit Article
           </h1>
         </header>
         
-        <main className="max-w-4xl mx-auto bg-white sm:p-6 md:p-8 sm:rounded-lg sm:shadow-md">
+  <main className="w-full sm:max-w-4xl mx-auto bg-white sm:p-6 md:p-8 sm:rounded-lg sm:shadow-md">
           <ArticleEditorForm
             initialData={article}
             onSubmit={handleUpdate}

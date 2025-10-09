@@ -45,7 +45,7 @@ const CreateArticlePage: React.FC = () => {
         MODIFIED: Main container now has ZERO horizontal padding on mobile (px-0)
         and brings it back on larger screens (sm:px-6). Vertical padding is now responsive.
       */}
-      <div className="container mx-auto px-0 sm:px-6 lg:px-8 py-8 md:py-12">
+  <div className="w-full sm:max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
         {/* 
           MODIFIED: The header gets its own padding on mobile so the title doesn't touch the edge.
         */}
@@ -64,7 +64,7 @@ const CreateArticlePage: React.FC = () => {
           MODIFIED: The main content card is now full-width on mobile.
           Padding, rounding, and shadow are removed on mobile and re-applied on larger screens.
         */}
-        <main className="max-w-4xl mx-auto bg-white sm:p-6 md:p-8 sm:rounded-xl sm:shadow-lg">
+  <main className="w-full sm:max-w-4xl mx-auto bg-white sm:p-6 md:p-8 sm:rounded-xl sm:shadow-lg">
           <ArticleEditorForm
             onSubmit={handleCreate}
             isLoading={isLoading}

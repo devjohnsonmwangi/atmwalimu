@@ -61,7 +61,8 @@ const DashboardLayout = () => {
           - `overflow-y-auto`: Ensures content inside this area can scroll independently if it's too long.
         */}
         <main className="flex-1 overflow-y-auto">
-          <div className="p-4 sm:p-6 lg:p-8">
+          {/* Add bottom padding on small screens so fixed BottomNav (h-16) does not cover content */}
+          <div className="p-4 sm:p-6 lg:p-8 pb-20 sm:pb-0">
             <Outlet /> {/* Your dashboard page content (e.g., DashboardPage) renders here */}
           </div>
         </main>

@@ -82,8 +82,8 @@ const CategoryManager: React.FC = () => {
   const cancelDelete = () => setPendingDeleteId(null);
 
   return (
-    <div className="bg-white p-2 sm:p-4 md:p-6 rounded-xl shadow-md">
-      <h2 className="text-2xl font-bold text-gray-800 mb-4">Manage Categories</h2>
+    <div className="w-full bg-white p-3 sm:p-4 md:p-6 rounded-xl shadow-md">
+      <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-4">Manage Categories</h2>
       
       {/* Create Category Form */}
       <form onSubmit={handleCreate} className="flex flex-col sm:flex-row gap-3 mb-4 items-center">

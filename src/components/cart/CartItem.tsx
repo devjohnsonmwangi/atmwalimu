@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Document } from '../../features/documents/docmentsApi';
 import { useFileDownloader } from '../../hooks/useFileDownloader';
+import { useNavigate } from 'react-router-dom';
 import Button from '../Button';
 import { Trash2, FileText, CheckCircle, Eye, Download } from 'lucide-react';
 
@@ -13,8 +14,12 @@ interface CartItemProps {
 
 const CartItem: React.FC<CartItemProps> = ({ item, isPurchased, onRemove }) => {
   const { downloadFile, isLoading: isDownloading } = useFileDownloader();
+  const navigate = useNavigate();
 
-  const handleView = () => window.open(item.documentUrl, '_blank');
+  const handleView = () => {
+    // Navigate to the document detail route within the app so users see the preview page
+    navigate(`/documents/${item.documentId}`);
+  };
 
   const handleDownload = () => {
     const fileExtension = item.documentUrl.split('.').pop() || 'file';

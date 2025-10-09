@@ -30,6 +30,7 @@ import NotificationsPage from './pages/Notifications';
 
 // --- IMPORT ALL DOCUMENT & LIBRARY COMPONENTS ---
 import AllDocumentsPage from './pages/dashboard/main/managedocs/AllDocumentsPage.tsx';
+import DocumentDetailPage from './pages/dashboard/main/managedocs/DocumentDetailPage.tsx';
 import CartPage from './pages/dashboard/main/managedocs/CartPage.tsx';
 import LibraryPage from './pages/dashboard/main/managedocs/LibraryPage.tsx';
 import UploadForApprovalPage from './pages/dashboard/main/managedocs/UploadForApprovalPage.tsx';
@@ -97,6 +98,7 @@ const router = createBrowserRouter([
   { path: 'contact', element: <ContactPage /> },
   { path: 'how-it-works', element: <HowItWorks /> },
       { path: 'documents', element: <AllDocumentsPage /> },
+  { path: 'documents/:documentId', element: <DocumentDetailPage /> },
       { path: 'featured', element: <FeaturedDocumentsPage /> },
       
       // --- NEWLY ADDED PUBLIC ARTICLE ROUTES ---
@@ -169,6 +171,7 @@ const router = createBrowserRouter([
 
       //dashboard document  this  will  help  in  navigating  to  documents  while  in  the dashbaord 
       { path: 'dashboard/documents', element: <AllDocumentsPage /> },
+  { path: 'dashboard/documents/:documentId', element: <DocumentDetailPage /> },
   { path: 'my-submissions', element: <MySubmissionsPage /> },
     
 
