@@ -39,13 +39,13 @@ async function optimizeFile(file) {
     if (stat.size < MIN_SIZE_TO_OPTIMIZE) return null;
     if (!isRaster(file)) return null;
 
-    const basename = path.basename(file, path.extname(file));
+  const basename = path.basename(file, path.extname(file));
   // derive project root from this script location (works in ESM)
   const __dirname = path.dirname(new URL(import.meta.url).pathname.replace(/^\/?([A-Z]:)?\//, ''));
   const projectRoot = path.resolve(__dirname, '..');
   const relDir = path.relative(projectRoot, path.dirname(file));
   // replace any unsafe chars; then normalize Windows backslashes to forward slashes
-  const safeDir = relDir.replace(/[^a-zA-Z0-9_\-]/g, '_').replace(/\\/g, '/');
+  const safeDir = relDir.replace(/[^a-zA-Z0-9_-]/g, '_').replace(/\\/g, '/');
     const outDir = path.join(OUTPUT_DIR, safeDir);
     await fs.mkdir(outDir, { recursive: true });
 
