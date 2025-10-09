@@ -1,68 +1,57 @@
+// pwa.config.ts
+
+// 1. IMPORT THE TYPE DEFINITIONS FROM THE PLUGIN
 import type { VitePWAOptions } from 'vite-plugin-pwa';
 
+// 2. ANNOTATE YOUR OBJECT with the Partial<VitePWAOptions> type.
+//    'Partial' makes all properties of VitePWAOptions optional.
 export const pwaOptions: Partial<VitePWAOptions> = {
   registerType: 'autoUpdate',
-  includeAssets: ['favicon.svg', 'robots.txt', 'apple-touch-icon.png'],
+  workbox: {
+    skipWaiting: true,
+    clientsClaim: true,
+    globPatterns: ['**/*.{js,css,html,ico,png,svg,json,webmanifest,woff,woff2}'],
+    runtimeCaching: [
+      {
+        urlPattern: ({ url }) => url.pathname.startsWith('/api'),
+        handler: 'CacheFirst',
+        options: {
+          cacheName: 'api-cache',
+          expiration: {
+            maxEntries: 10,
+            maxAgeSeconds: 60 * 15, // 15 Minutes
+          },
+        },
+      },
+    ],
+  },
   manifest: {
-  name: '@Mwalimu',
-  short_name: '@Mwalimu',
-    description: 'Your Ultimate Educational Companion',
-    theme_color: '#ffffff',
+    name: 'Mwalimu Companion',
+    short_name: 'MwalimuApp',
+    description: 'A companion app for teachers.',
+    theme_color: '#1e40af', // Example: a nice blue
     background_color: '#ffffff',
     display: 'standalone',
     scope: '/',
     start_url: '/',
+    orientation: 'portrait',
     icons: [
       {
-        src: '/atmwalimulogo.png',
+        src: '/public/atmwalimulogo.png',
         sizes: '192x192',
         type: 'image/png',
       },
       {
-        src: '/atmwalimulogo.png',
+        src: '/public/atmwalimulogo.png',
         sizes: '512x512',
         type: 'image/png',
       },
       {
-        src: '/atmwalimulogo.png',
+        src: '/public/atmwalimulogo.png',
         sizes: '512x512',
         type: 'image/png',
         purpose: 'any maskable',
       },
     ],
   },
-  workbox: {
-    globPatterns: ['**/*.{js,css,html,ico,png,svg,json,vue,txt,woff2}'],
-    // THIS IS THE QUICK FIX - NOT A GOOD LONG-TERM SOLUTION
-    maximumFileSizeToCacheInBytes: 50 * 1024 * 1024, // e.g., 11 MiB to allow your 10.3MB file
-    // ... other workbox options
-  
-   // Example: To avoid caching large sourcemaps if 'hidden' isn't enough for your PWA caching
-    globIgnores: ['**/*.map'],
-    //If your app is an SPA and uses client-side routing for all paths
-    navigateFallback: '/index.html',
-    cleanupOutdatedCaches: true, // Important to remove old caches on new service worker activation
-   // Consider runtimeCaching for API calls or third-party assets
-    runtimeCaching: [
-      {
-        urlPattern: /^https:\/\/yourapi\.example\.com\//,
-        handler: 'NetworkFirst', // Or 'CacheFirst', 'StaleWhileRevalidate'
-        options: {
-          cacheName: 'api-cache',
-          expiration: {
-            maxEntries: 50,
-            maxAgeSeconds: 60 * 60 * 24 * 7, // 1 week
-          },
-          cacheableResponse: {
-            statuses: [0, 200],
-          },
-        },
-      },
-    ],
-  },
-  devOptions: {
-    enabled: false, // Usually enable PWA features only for builds, not during dev for faster HMR
-    type: 'module',
-  },
- 
 };
