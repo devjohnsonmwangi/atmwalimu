@@ -1,15 +1,18 @@
 // pwa.config.ts
 
-// 1. IMPORT THE TYPE DEFINITIONS FROM THE PLUGIN
 import type { VitePWAOptions } from 'vite-plugin-pwa';
 
-// 2. ANNOTATE YOUR OBJECT with the Partial<VitePWAOptions> type.
-//    'Partial' makes all properties of VitePWAOptions optional.
 export const pwaOptions: Partial<VitePWAOptions> = {
   registerType: 'autoUpdate',
   workbox: {
     skipWaiting: true,
     clientsClaim: true,
+
+    // --- FIX #1: ADDED THIS LINE TO SOLVE THE BUILD ERROR ---
+    // Increases the file size limit for precaching from 2MB to 3MB.
+    // This allows your large image to be included in the service worker.
+    maximumFileSizeToCacheInBytes: 3145728, // 3 * 1024 * 1024 bytes
+
     globPatterns: ['**/*.{js,css,html,ico,png,svg,json,webmanifest,woff,woff2}'],
     runtimeCaching: [
       {
@@ -29,25 +32,28 @@ export const pwaOptions: Partial<VitePWAOptions> = {
     name: 'Mwalimu Companion',
     short_name: 'MwalimuApp',
     description: 'A companion app for teachers.',
-    theme_color: '#1e40af', // Example: a nice blue
+    theme_color: '#1e40af',
     background_color: '#ffffff',
     display: 'standalone',
     scope: '/',
     start_url: '/',
     orientation: 'portrait',
     icons: [
+      // --- FIX #2: CORRECTED ICON PATHS ---
+      // Files in the 'public' folder are served from the root '/'.
+      // You should not include '/public' in the path.
       {
-        src: '/public/atmwalimulogo.png',
+        src: '/atmwalimulogo.png', // Corrected from '/public/atmwalimulogo.png'
         sizes: '192x192',
         type: 'image/png',
       },
       {
-        src: '/public/atmwalimulogo.png',
+        src: '/atmwalimulogo.png', // Corrected from '/public/atmwalimulogo.png'
         sizes: '512x512',
         type: 'image/png',
       },
       {
-        src: '/public/atmwalimulogo.png',
+        src: '/atmwalimulogo.png', // Corrected from '/public/atmwalimulogo.png'
         sizes: '512x512',
         type: 'image/png',
         purpose: 'any maskable',
