@@ -9,7 +9,7 @@ import heroImage1 from '../../assets/imageses/communityimageatmwalilimu.png';
 import heroImage2 from '../../assets/imageses/atmwalimuheroimage1.png';
 import heroImage3 from '../../assets/imageses/docmentsimagelibrary.png';
 import heroImage4 from '../../assets/imageses/subscriptionandpaymentstafssatmwalimu.png';
-import { optimizedSources } from '../../utils/imagePaths';
+// serving assets directly from imports
 
 const imageSet = [
     { importSrc: heroImage1, relDir: 'src/assets/imageses', basename: 'communityimageatmwalilimu' },
@@ -45,6 +45,7 @@ const Hero: FC<HeroProps> = ({ theme = 'light' }) => {
         return () => clearInterval(interval);
     }, []);
 
+    // use local imports for hero images
     useEffect(() => {
         const timer = setTimeout(() => setContentLoaded(true), 100);
         return () => clearTimeout(timer);
@@ -78,16 +79,15 @@ const Hero: FC<HeroProps> = ({ theme = 'light' }) => {
                 {images.map((imageObj, index) => (
                     <div key={index} className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out ${index === currentImageIndex ? 'opacity-100' : 'opacity-0'}`}>
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                        <picture className="w-full h-full block">
-                          <source type="image/avif" srcSet={optimizedSources(imageObj.relDir, imageObj.basename).avifSrcSet} />
-                          <source type="image/webp" srcSet={optimizedSources(imageObj.relDir, imageObj.basename).webpSrcSet} />
-                          <img
-                            src={optimizedSources(imageObj.relDir, imageObj.basename).fallback}
-                            onError={(e)=>{ (e.currentTarget as HTMLImageElement).src = imageObj.importSrc }}
-                            alt={`Hero ${index + 1}`}
-                            className="w-full h-full object-cover kenburns-active"
-                          />
-                        </picture>
+                                                <div className="w-full h-full block">
+                                                    <img
+                                                                                                        loading="lazy"
+                                                                                                        src={imageObj.importSrc}
+                                                                                                        onError={(e)=>{ (e.currentTarget as HTMLImageElement).src = imageObj.importSrc }}
+                                                                                                        alt={`Hero ${index + 1}`}
+                                                                                                        className="w-full h-full object-cover kenburns-active"
+                                                                                                />
+                                                </div>
                     </div>
                 ))}
             </div>

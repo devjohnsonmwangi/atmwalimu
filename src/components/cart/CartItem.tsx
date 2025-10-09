@@ -18,7 +18,8 @@ const CartItem: React.FC<CartItemProps> = ({ item, isPurchased, onRemove }) => {
 
   const handleView = () => {
     // Navigate to the document detail route within the app so users see the preview page
-    navigate(`/documents/${item.documentId}`);
+    // Use dashboard-scoped document route when viewing from the dashboard/cart
+    navigate(`/dashboard/documents/${item.documentId}`);
   };
 
   const handleDownload = () => {

@@ -5,12 +5,11 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { Link, useNavigate } from "react-router-dom";
 import { Toaster, toast } from 'sonner';
-import { useState } from "react";
 
 // Component Imports
 //import Navbar from "../../components/navbar/Navbar";
 import authImage from "../../assets/imageses/registerimageatmwalimu.png"; 
-import { optimizedSources } from '../../utils/imagePaths';
+import { useState } from 'react';
 import { usersAPI } from "../../features/users/usersAPI";
 import PasswordStrengthIndicator from "../../components/PasswordStrengthIndicator";
 
@@ -66,6 +65,8 @@ const Register = () => {
   } = useForm<RegisterFormData>({ resolver: yupResolver(schema), mode: 'onTouched' });
   
   const password = watch("password");
+
+  // Use local asset directly
 
   const onSubmit: SubmitHandler<RegisterFormData> = async (data) => {
     let toastId: string | number | undefined;
@@ -134,11 +135,9 @@ const Register = () => {
                 <p className="mt-4 text-gray-600 text-lg">
                   Unlock access to countless resources, connect with peers, and accelerate your learning journey.
                 </p>
-                <picture className="mt-8 block w-full">
-                  <source type="image/avif" srcSet={optimizedSources('src/assets/imageses','registerimageatmwalimu').avifSrcSet} />
-                  <source type="image/webp" srcSet={optimizedSources('src/assets/imageses','registerimageatmwalimu').webpSrcSet} />
-                  <img src={optimizedSources('src/assets/imageses','registerimageatmwalimu').fallback} onError={(e)=>{ (e.currentTarget as HTMLImageElement).src = authImage }} alt="Students collaborating" className="w-full h-auto object-contain rounded-lg" />
-                </picture>
+                <div className="mt-8 block w-full">
+                  <img loading="lazy" src={authImage} onError={(e)=>{ (e.currentTarget as HTMLImageElement).src = authImage }} alt="Students collaborating" className="w-full h-auto object-contain rounded-lg" />
+                </div>
             </div>
         </div>
 

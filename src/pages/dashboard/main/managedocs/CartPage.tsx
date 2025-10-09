@@ -83,7 +83,7 @@ const CartPage: React.FC = () => {
             <div className="text-center mt-10 p-6 bg-white rounded-lg shadow-sm">
               <h3 className="text-xl font-semibold text-gray-800">Your cart is empty</h3>
               <p className="text-gray-600 mt-2 mb-4">Looks like you haven't added any documents yet.</p>
-              <Link to="/dashboard/documents">
+              <Link to="/documents">
                 <Button>Start Browsing</Button>
               </Link>
             </div>

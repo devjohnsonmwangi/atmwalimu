@@ -14,7 +14,16 @@ export function optimizedSrcSet(relDir: string, basename: string, widths: number
   return widths.map((w) => `${base}/${basename}-${w}.${ext} ${w}w`).join(', ');
 }
 
+import { getCdnUrl } from './cdnMapping';
+
 export function optimizedFallback(relDir: string, basename: string) {
+  // Prefer CDN mapping secure_url when available (mapping keys include extension)
+  const tryNames = [basename + '.png', basename + '.jpg', basename + '.webp'];
+  for (const n of tryNames) {
+    const cdn = getCdnUrl(n);
+    if (cdn) return cdn;
+  }
+
   const base = optimizedBasePath(relDir);
   return `${base}/${basename}.jpg`;
 }

@@ -55,6 +55,7 @@ import DashboardPage from './pages/dashboard/DashboardPage.tsx';
 import UserProfilePage from './pages/dashboard/main/Profile.tsx';
 import SettingsPage from './pages/dashboard/main/SettingsPage';
 import LogoutComponent from './components/logout/logout.tsx';
+import HelpCenter from './pages/dashboard/helpcenter';
 
 
 // ===================================================================
@@ -179,6 +180,7 @@ const router = createBrowserRouter([
 
       { path: 'profile', element: <UserProfilePage /> },
       { path: 'settings', element: <SettingsPage /> },
+  { path: 'help', element: <HelpCenter /> },
       { path: 'logout', element: <LogoutComponent /> },
       { path: 'notifications', element: <NotificationsPage /> },
     ],
@@ -212,13 +214,26 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 // --- PWA SERVICE WORKER REGISTRATION ---
 // ===================================================================
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/service-worker.js')
-      .then(registration => {
-        console.log('✅ Service Worker registered successfully with scope:', registration.scope);
-      })
-      .catch(registrationError => {
-        console.error('❌ Service Worker registration failed:', registrationError);
-      });
-  });
+  if (import.meta.env.PROD) {
+    // Only register the production service worker in production builds.
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then(registration => {
+          console.log('✅ Service Worker registered successfully with scope:', registration.scope);
+        })
+        .catch(registrationError => {
+          console.error('❌ Service Worker registration failed:', registrationError);
+        });
+    });
+  } else {
+    // In development, unregister any previously installed service workers to avoid them
+    // intercepting dev server requests (common cause of "Failed to fetch" errors).
+    navigator.serviceWorker.getRegistrations().then((regs) => {
+      for (const reg of regs) {
+        reg.unregister().then((ok) => {
+          if (ok) console.log('🧹 Unregistered service worker (dev mode):', reg.scope);
+        }).catch(() => {});
+      }
+    }).catch(() => {});
+  }
 }

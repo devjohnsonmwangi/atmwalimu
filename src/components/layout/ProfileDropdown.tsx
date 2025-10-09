@@ -83,7 +83,7 @@ const ProfileDropdown = () => {
                 aria-haspopup="true"
                 aria-expanded={isOpen}
             >
-                <div className="w-8 rounded-full ring-2 ring-primary ring-offset-base-100 ring-offset-2">
+                    <div className="w-8 rounded-full ring-2 ring-primary ring-offset-base-100 ring-offset-2">
                     <img src={userData?.profilePictureUrl || "/atmwalimulogo.png"} alt="User Avatar" />
                 </div>
             </label>

@@ -27,9 +27,9 @@ const getFileType = (url: string): FileType => {
 };
 
 const PreviewLoader: React.FC<{ message: string }> = ({ message }) => (
-    <div className="flex-grow flex flex-col items-center justify-center p-10 text-gray-600 bg-gray-50">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600 mb-4" />
-        <p>{message}</p>
+    <div className="flex-grow flex flex-col items-center justify-center p-8 text-gray-600 bg-gray-50">
+        <Loader2 className="h-7 w-7 animate-spin text-blue-600 mb-3" />
+        <p className="text-sm">{message}</p>
     </div>
 );
 
@@ -43,30 +43,42 @@ const PdfPreview: React.FC<{ fileUrl: string; isFree: boolean }> = ({ fileUrl, i
     const [currentPage, setCurrentPage] = useState(1);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const docRef = useRef<boolean>(false);
 
     const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => { setNumPages(numPages); setIsLoading(false); };
     const onDocumentLoadError = () => { setError("Failed to load PDF."); setIsLoading(false); };
 
-    // UPDATED LOGIC: Use the fixed page limit for paid docs.
+    // Only render the heavy PDF Document once the component is mounted and in view.
+    useEffect(() => { docRef.current = true; return () => { docRef.current = false; }; }, []);
+
     const displayablePages = isFree || !numPages ? numPages : Math.min(PAID_PDF_PAGE_LIMIT, numPages);
-    
     const canGoPrev = currentPage > 1;
     const canGoNext = displayablePages ? currentPage < displayablePages : false;
     const buttonStyles = "px-4 py-2 border border-gray-300 bg-white rounded-md transition-colors hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed";
 
     if (isLoading) return <PreviewLoader message="Loading PDF Preview..." />;
-    if (error) return <div className="flex-grow flex items-center justify-center p-10 text-red-700 bg-red-50">{error}</div>;
+    if (error) return <div className="flex-grow flex items-center justify-center p-8 text-red-700 bg-red-50">{error}</div>;
 
     return (
         <div className="flex flex-col w-full h-full bg-gray-200">
             {!isFree && numPages && ( <div className="px-5 py-3 text-center text-sm bg-yellow-50 text-yellow-800 border-b border-yellow-200"> <strong>PREVIEW MODE.</strong> Showing the first {displayablePages} of {numPages} pages. </div> )}
             <div className="flex-grow flex justify-center py-5 overflow-y-auto">
-                <div className="shadow-lg"><Document file={fileUrl} onLoadSuccess={onDocumentLoadSuccess} onLoadError={onDocumentLoadError}><Page pageNumber={currentPage} /></Document></div>
+                <div className="shadow-lg">
+                    {/* Render Document only when the pdfjs worker and component are ready to avoid blocking */}
+                    <Document
+                        file={fileUrl}
+                        onLoadSuccess={onDocumentLoadSuccess}
+                        onLoadError={onDocumentLoadError}
+                        loading={<PreviewLoader message="Decoding PDF..." />}
+                    >
+                        <Page pageNumber={currentPage} renderAnnotationLayer={false} renderTextLayer={false} />
+                    </Document>
+                </div>
             </div>
             <div className="flex-shrink-0 flex justify-center items-center p-4 bg-white border-t border-gray-200">
-                <button onClick={() => setCurrentPage(p => p - 1)} disabled={!canGoPrev} className={buttonStyles}>‹ Prev</button>
+                <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={!canGoPrev} className={buttonStyles}>‹ Prev</button>
                 <span className="mx-4 text-gray-700 font-medium">Page {currentPage} of {displayablePages}</span>
-                <button onClick={() => setCurrentPage(p => p + 1)} disabled={!canGoNext} className={buttonStyles}>Next ›</button>
+                <button onClick={() => setCurrentPage(p => Math.min((displayablePages as number) || p + 1, p + 1))} disabled={!canGoNext} className={buttonStyles}>Next ›</button>
             </div>
         </div>
     );
@@ -94,9 +106,9 @@ const VideoPreview: React.FC<{ fileUrl: string; isFree: boolean }> = ({ fileUrl,
                 ref={videoRef}
                 src={fileUrl}
                 controls
+                preload="metadata"
                 onTimeUpdate={handleTimeUpdate}
                 onLoadedData={() => setIsLoading(false)}
-                // UPDATED: Removed max-w-5xl to make the video wider
                 className={`w-full max-h-[85vh] rounded-lg shadow-2xl bg-black ${isLoading ? 'hidden' : ''}`}
             />
             {!isFree && showPurchaseOverlay && (
@@ -119,13 +131,14 @@ const WordPreview: React.FC<{ fileUrl: string; isFree: boolean }> = ({ fileUrl, 
         <div className="relative flex-grow w-full h-full overflow-hidden bg-gray-200">
             {isLoading && <PreviewLoader message="Loading Document Viewer..." />}
             {/* This container crops the iframe to a fixed height for paid docs */}
-            <div className={`w-full ${isFree ? 'h-full' : 'h-[1800px]'}`}>
+            <div className={`w-full ${isFree ? 'h-full' : 'h-[900px]'}`}>
                 <iframe
                     src={viewerUrl}
                     title="Word Document Preview"
                     onLoad={() => setIsLoading(false)}
                     className={`w-full h-full ${isLoading ? 'hidden' : ''}`}
                     frameBorder="0"
+                    loading="lazy"
                 />
             </div>
             {!isFree && !isLoading && (
@@ -147,7 +160,7 @@ const ImagePreview: React.FC<{ fileUrl: string; isFree: boolean }> = ({ fileUrl,
     return (
         <div className="relative flex-grow flex items-center justify-center p-4 bg-gray-200 overflow-hidden">
              {isLoading && <PreviewLoader message="Loading Image..." />}
-             <img src={fileUrl} alt="Document Preview" onLoad={() => setIsLoading(false)} className={`max-w-full max-h-full object-contain transition-all duration-300 ${isLoading ? 'hidden' : ''} ${!isFree ? 'filter blur-xl scale-110' : ''}`} />
+             <img src={fileUrl} alt="Document Preview" onLoad={() => setIsLoading(false)} decoding="async" loading="lazy" className={`max-w-full max-h-full object-contain transition-all duration-300 ${isLoading ? 'hidden' : ''} ${!isFree ? 'filter blur-xl scale-110' : ''}`} />
              {!isFree && !isLoading && (
                  <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-center text-white p-8">
                     <Lock className="h-12 w-12 text-white mb-4" />
