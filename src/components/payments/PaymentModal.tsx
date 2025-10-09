@@ -110,14 +110,34 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
       } else {
         throw new Error("No document ID was provided for payment.");
       }
-      // **IMPROVED**: Use the actual success message and store server message
-  const resp = response as PaymentResponse & { message?: string };
-  const successMessage = typeof resp?.message === 'string' ? resp.message : 'Request sent successfully!';
-  setServerMessage(successMessage);
-  toast.success(successMessage, { id: toastId });
-  toast('Please check your phone to complete payment.');
-  const checkoutId = typeof resp?.checkoutRequestId === 'string' ? resp.checkoutRequestId : null;
-  setCheckoutRequestId(checkoutId);
+      // **IMPROVED**: Use the actual success message and honor backend status immediately
+      const resp = response as PaymentResponse & { message?: string } | null;
+      const serverMsg = resp && typeof resp.message === 'string' ? resp.message : null;
+
+      if (resp?.status === 'completed') {
+        // Backend indicates the payment is already completed
+        const msg = serverMsg || 'Payment completed successfully.';
+        setServerMessage(msg);
+        setPaymentStatus('confirmed');
+        toast.success(msg, { id: toastId });
+        setTimeout(() => { onPaymentSuccess(); onClose(); }, 1500);
+        return;
+      }
+
+      if (resp?.status === 'failed') {
+        const msg = serverMsg || 'Payment failed.';
+        setServerMessage(msg);
+        setPaymentStatus('failed');
+        toast.error(msg, { id: toastId });
+        return;
+      }
+
+      // Otherwise it's a pending initiation (STK push)
+      setServerMessage(serverMsg || 'Request sent successfully!');
+      toast.success(serverMsg || 'Request sent successfully!', { id: toastId });
+      toast('Please check your phone to complete payment.');
+      const checkoutId = resp && typeof resp.checkoutRequestId === 'string' ? resp.checkoutRequestId : null;
+      setCheckoutRequestId(checkoutId);
       setPaymentStatus('pending');
     } catch (err: unknown) {
       // **IMPROVED**: Display the EXACT error message from the backend API
