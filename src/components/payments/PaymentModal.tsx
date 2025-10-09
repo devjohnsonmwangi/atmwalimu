@@ -6,6 +6,7 @@ import {
   useInitiateBulkPaymentMutation,
   useLazyConfirmPaymentQuery,
 } from '../../features/documents/docmentsApi'; // Adjust path if needed
+import type { PaymentResponse } from '../../features/documents/docmentsApi';
 import Modal from '../Modal'; // Your base Modal component
 import Button from '../Button'; // Your custom Button component
 import { Phone, CheckCircle, XCircle, Loader, ShieldCheck, Zap, Lock } from 'lucide-react';
@@ -37,6 +38,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
   const [phoneNumber, setPhoneNumber] = useState('');
   const [paymentStatus, setPaymentStatus] = useState<'idle' | 'initiating' | 'pending' | 'confirmed' | 'failed'>('idle');
   const [checkoutRequestId, setCheckoutRequestId] = useState<string | null>(null);
+  const [serverMessage, setServerMessage] = useState<string | null>(null);
 
   // --- RTK QUERY HOOKS ---
   const [initiateSinglePayment, { isLoading: isInitiatingSingle }] = useInitiateDocumentPaymentMutation();
@@ -70,7 +72,11 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
   useEffect(() => {
     if (confirmationData?.status === 'completed') {
       setPaymentStatus('confirmed');
-      toast.success('Payment Confirmed! Your items are ready.');
+      // Prefer server-provided message if available (safely)
+      const conf = confirmationData as PaymentResponse & { message?: string };
+      const msg = typeof conf?.message === 'string' ? conf.message : 'Payment Confirmed! Your items are ready.';
+      setServerMessage(msg);
+      toast.success(msg);
       setTimeout(() => {
         onPaymentSuccess();
         onClose();
@@ -80,7 +86,11 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
       // **IMPROVED**: Extract the specific error message from the polling error
       type ApiError = { data?: { message?: string } };
       const apiError = confirmationError as ApiError;
-      const message = apiError?.data?.message || 'Payment failed or was cancelled by the user.';
+      const messageFromError = typeof apiError?.data?.message === 'string' ? apiError.data!.message : null;
+      const conf = confirmationData as PaymentResponse & { message?: string };
+      const messageFromConfirmation = typeof conf?.message === 'string' ? conf.message : null;
+      const message = messageFromError || messageFromConfirmation || 'Payment failed or was cancelled by the user.';
+      setServerMessage(message);
       toast.error(message);
     }
   }, [confirmationData, confirmationError, onPaymentSuccess, onClose]);
@@ -92,7 +102,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
     const toastId = toast.loading('Sending STK push request...');
 
     try {
-      let response;
+      let response: PaymentResponse | null = null;
       if (documentIds && documentIds.length > 0) {
         response = await initiateBulkPayment({ documentIds, phoneNumber }).unwrap();
       } else if (documentId) {
@@ -100,11 +110,14 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
       } else {
         throw new Error("No document ID was provided for payment.");
       }
-      
-      // **IMPROVED**: Use the actual success message from the API if available
-      toast.success('Request sent successfully!', { id: toastId });
-      toast('Please check your phone to complete payment.');
-      setCheckoutRequestId(response.checkoutRequestId);
+      // **IMPROVED**: Use the actual success message and store server message
+  const resp = response as PaymentResponse & { message?: string };
+  const successMessage = typeof resp?.message === 'string' ? resp.message : 'Request sent successfully!';
+  setServerMessage(successMessage);
+  toast.success(successMessage, { id: toastId });
+  toast('Please check your phone to complete payment.');
+  const checkoutId = typeof resp?.checkoutRequestId === 'string' ? resp.checkoutRequestId : null;
+  setCheckoutRequestId(checkoutId);
       setPaymentStatus('pending');
     } catch (err: unknown) {
       // **IMPROVED**: Display the EXACT error message from the backend API
@@ -112,6 +125,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
       if (typeof err === 'object' && err !== null && 'data' in err && typeof (err as { data?: { message?: string } }).data?.message === 'string') {
         message = (err as { data: { message: string } }).data.message;
       }
+      setServerMessage(message);
       toast.error(message, { id: toastId });
       setPaymentStatus('failed');
     }
@@ -177,6 +191,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
               <Loader className="mx-auto h-16 w-16 text-blue-500 animate-spin mb-4" />
               <h3 className="text-2xl font-bold text-gray-800">Awaiting Confirmation</h3>
               <p className="mt-2 text-gray-500">Check your phone to enter your M-Pesa PIN.</p>
+              {serverMessage && <p className="mt-3 text-sm text-gray-600">{serverMessage}</p>}
               <Button variant="danger" onClick={onClose} className="mt-6">
                 Cancel Payment
               </Button>
@@ -189,7 +204,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
                     <CheckCircle className="mx-auto h-20 w-20 text-green-500" />
                 </motion.div>
                 <h3 className="text-2xl font-bold text-gray-800 mt-4">Payment Successful!</h3>
-                <p className="mt-2 text-gray-500">Your documents are now unlocked. Redirecting...</p>
+        <p className="mt-2 text-gray-500">{serverMessage || 'Your documents are now unlocked. Redirecting...'}</p>
             </div>
           )}
           
@@ -199,7 +214,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
                     <XCircle className="mx-auto h-20 w-20 text-red-500" />
                 </motion.div>
                 <h3 className="text-2xl font-bold text-gray-800 mt-4">Payment Failed</h3>
-                <p className="text-gray-500 mt-2">An error occurred. Please check the details and try again.</p>
+        <p className="text-gray-500 mt-2">{serverMessage || 'An error occurred. Please check the details and try again.'}</p>
                 <Button onClick={() => setPaymentStatus('idle')} className="mt-6">
                     Try Again
                 </Button>
