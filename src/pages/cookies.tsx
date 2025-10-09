@@ -28,7 +28,7 @@ const CookiePolicyPage: FC = () => {
     <>
       <Header />
       <div className="min-h-screen bg-slate-50 dark:bg-slate-900 pt-14 py-4 sm:py-8 transition-colors duration-300">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full px-4 sm:px-6 lg:px-8">
           <header className="text-center mb-10 md:mb-12">
             <Cookie className="mx-auto h-16 w-16 text-amber-500 dark:text-amber-400 mb-4" />
             <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
