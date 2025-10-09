@@ -10,11 +10,27 @@ import {
 // --- 1. FONT IMPORTER COMPONENT ---
 // ===================================================================
 // This self-contained component injects the 'Lora' font into the page head.
-const FontImporter: FC = memo(() => (
-    <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Lora:wght@700&display=swap');
-    `}</style>
-));
+const FontImporter: FC = memo(() => {
+    React.useEffect(() => {
+        if (typeof document === 'undefined') return;
+        const linkId = 'font-lora-stylesheet';
+        const styleId = 'font-lora-global-styles';
+        if (!document.getElementById(linkId)) {
+            const link = document.createElement('link');
+            link.id = linkId;
+            link.rel = 'stylesheet';
+            link.href = 'https://fonts.googleapis.com/css2?family=Lora:wght@700&display=swap';
+            document.head.appendChild(link);
+        }
+        if (!document.getElementById(styleId)) {
+            const style = document.createElement('style');
+            style.id = styleId;
+            style.innerHTML = `.font-serif::after { background-color: var(--underline-color); }`;
+            document.head.appendChild(style);
+        }
+    }, []);
+    return null;
+});
 
 // ===================================================================
 // --- 2. REUSABLE HOVER TITLE COMPONENT ---
@@ -27,8 +43,14 @@ interface HoverTitleProps {
 }
 
 const HoverTitle: FC<HoverTitleProps> = ({ as: Tag = 'h2', children, className = '', color }) => {
-    const { theme } = useTheme();
-    const underlineColor = theme === 'light' ? 'rgb(0, 120, 215)' : 'rgb(100, 180, 255)';
+    // styling handled globally
+    const underlineColor = color; // use the provided color for the underline
+
+    const styleVars: React.CSSProperties & Record<string, string> = {
+        color,
+        fontFamily: "'Lora', serif", // Apply the cool font here
+        ['--underline-color']: underlineColor
+    };
 
     return (
         <Tag
@@ -38,15 +60,8 @@ const HoverTitle: FC<HoverTitleProps> = ({ as: Tag = 'h2', children, className =
                        after:transition-transform after:duration-300 after:ease-out
                        group-hover:after:scale-x-100 hover:after:scale-x-100 
                        ${className}`}
-            style={{
-                color,
-                fontFamily: "'Lora', serif", // Apply the cool font here
-                '--underline-color': underlineColor
-            } as React.CSSProperties}
+            style={styleVars}
         >
-            <style jsx>{`
-                .font-serif::after { background-color: var(--underline-color); }
-            `}</style>
             {children}
         </Tag>
     );
