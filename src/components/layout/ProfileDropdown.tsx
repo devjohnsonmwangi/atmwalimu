@@ -10,40 +10,16 @@ import { usersAPI } from '../../features/users/usersAPI';
 import { authApi } from '../../features/login/loginAPI';
 
 // --- ICON IMPORTS ---
-import { User, Settings, LogOut, Sun, Moon } from 'lucide-react';
+import { User, Settings, LogOut } from 'lucide-react';
 
 // --- CONTEXT & HOOKS ---
-import { useTheme } from '../../contexts/ThemeContext';
+// Theme is fixed to light-only; ThemeContext provides a no-op toggle.
+// ThemeContext remains in place but app is light-only.
 
 // ===================================================================
 // --- RESTRUCTURED THEME TOGGLE SUB-COMPONENT ---
 // ===================================================================
-const ThemeToggleMenuItem = () => {
-    const { theme, toggleTheme } = useTheme();
-
-    return (
-        <button
-            onClick={toggleTheme}
-            className="flex w-full items-center justify-between"
-        >
-            {/* Left side: Icon and text */}
-            <span className="flex items-center gap-3">
-                {theme === 'light' ? <Sun className="w-4 h-4"/> : <Moon className="w-4 h-4"/>}
-                Theme
-            </span>
-            
-            {/* Right side: The visual toggle switch */}
-            <input 
-                type="checkbox" 
-                // ‼️ UPDATED CLASSNAME HERE ‼️
-                // We've changed `toggle-primary` to `toggle-success` to make it a distinct green.
-                className="toggle toggle-success pointer-events-none" 
-                checked={theme === 'dark'}
-                readOnly
-            />
-        </button>
-    );
-};
+// Theme toggle removed — app runs light-only.
 
 // ===================================================================
 // --- MAIN COMPONENT: The Profile Dropdown ---
@@ -108,7 +84,7 @@ const ProfileDropdown = () => {
                 aria-expanded={isOpen}
             >
                 <div className="w-8 rounded-full ring-2 ring-primary ring-offset-base-100 ring-offset-2">
-                    <img src={userData?.profilePictureUrl || "/src/assets/imageses/atmwalimulogo.png"} alt="User Avatar" />
+                    <img src={userData?.profilePictureUrl || "/atmwalimulogo.png"} alt="User Avatar" />
                 </div>
             </label>
             
@@ -120,7 +96,7 @@ const ProfileDropdown = () => {
                     </li>
                     <li><Link to="/dashboard/profile"><User className="w-4 h-4"/> Profile</Link></li>
                     <li><Link to="/dashboard/settings"><Settings className="w-4 h-4"/> Settings</Link></li>
-                    <li><ThemeToggleMenuItem /></li>
+                
                     <div className="divider my-1"></div>
                     <li>
                         <button onClick={handleLogout} disabled={isLoggingOut} className="text-error">

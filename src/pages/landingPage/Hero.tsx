@@ -15,7 +15,7 @@ const themes = ['light', 'dark'] as const;
 type Theme = typeof themes[number];
 
 interface HeroProps {
-    theme: Theme;
+    theme?: Theme;
 }
 
 // Added 'mode' prop to the button component
@@ -25,7 +25,7 @@ interface ButtonProps {
     mode?: 'light' | 'dark'; // Prop to indicate current mode, though not used for styling here
 }
 
-const Hero: FC<HeroProps> = ({ theme }) => {
+const Hero: FC<HeroProps> = ({ theme = 'light' }) => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [contentLoaded, setContentLoaded] = useState(false);
 

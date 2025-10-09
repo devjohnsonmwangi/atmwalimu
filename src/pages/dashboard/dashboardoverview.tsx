@@ -7,7 +7,7 @@ import {
   Newspaper, FilePlus2, Tags,
 
   // --- General UI Icons ---
-  ArrowRight, Bell, History, LoaderCircle, Sun, Moon, Info, Search, ShieldCheck
+  ArrowRight, Bell, History, LoaderCircle, Info, Search, ShieldCheck
 } from 'lucide-react';
 import { getStoredRecentPages, StoredVisitedPage } from '../../pages/dashboard/activity'; // Assuming path is correct
 import { filterDrawerByRole } from '../../components/drawer/drawerData'; // Assuming path is correct
@@ -65,27 +65,7 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
   const [recentPages, setRecentPages] = useState<StoredVisitedPage[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const location = useLocation();
-  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
-    if (typeof window !== 'undefined') {
-      const storedTheme = localStorage.getItem('theme');
-      if (storedTheme === 'light' || storedTheme === 'dark') return storedTheme;
-      return 'dark';
-    }
-    return 'dark';
-  });
-
-  useEffect(() => {
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    localStorage.setItem('theme', theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
-  };
+  // App is light-only; theme toggling removed.
 
   const fetchRecentPages = () => {
     setIsLoadingHistory(true);
@@ -140,13 +120,7 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             </p>
           </div>
           <div className="flex items-center gap-3 sm:gap-4">
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-full hover:bg-slate-300/70 dark:hover:bg-slate-700/70 transition-colors"
-              aria-label={theme === 'light' ? "Switch to dark mode" : "Switch to light mode"}
-            >
-              {theme === 'light' ? <Moon size={22} /> : <Sun size={24} className="text-yellow-400" />}
-            </button>
+            {/* Theme toggle removed — app is light-only */}
             <Link to="/dashboard/notifications" className="relative p-2 rounded-full hover:bg-slate-300/70 dark:hover:bg-slate-700/70 transition-colors" aria-label="Notifications">
               <Bell size={24} />
               {notificationCount > 0 && <span className="absolute top-0.5 right-0.5 block h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-slate-100 dark:ring-slate-800" />}
@@ -168,7 +142,7 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
               return (
                 <Link key={card.id} to={card.link} className="group bg-white dark:bg-slate-800 p-5 rounded-xl shadow-lg flex flex-col relative overflow-hidden border-l-4 transition-all duration-300 ease-in-out hover:-translate-y-2 hover:scale-[1.03] hover:bg-gradient-to-br hover:from-green-50 hover:to-sky-50 dark:hover:bg-gradient-to-br dark:hover:from-green-950/60 dark:hover:to-slate-800 hover:border-green-500 dark:hover:border-green-400 hover:shadow-2xl dark:hover:shadow-green-400/30" style={{ borderColor: card.borderColor }}>
                   <div className="flex items-start mb-3">
-                    <div className="p-3 rounded-lg mr-4 shadow-sm transition-all duration-300 ease-in-out group-hover:scale-110 group-hover:-rotate-6 group-hover:bg-green-500 dark:group-hover:bg-green-500" style={{ backgroundColor: theme === 'light' ? card.iconBgColor : '' }}>
+                    <div className={`p-3 rounded-lg mr-4 shadow-sm transition-all duration-300 ease-in-out group-hover:scale-110 group-hover:-rotate-6 group-hover:bg-green-500 dark:group-hover:bg-green-500 ${card.iconBgColor}`}>
                       <IconComponent size={28} className="transition-colors duration-300 group-hover:text-white dark:group-hover:text-white" strokeWidth={1.75} style={{ color: card.iconTextColor }}/>
                     </div>
                     <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors mt-1">{card.title}</h3>

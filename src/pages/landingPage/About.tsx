@@ -1,5 +1,4 @@
 import React, { FC, memo } from 'react';
-import { useTheme } from '../../contexts/ThemeContext';
 
 // --- Icons ---
 import {
@@ -107,8 +106,6 @@ const Card: FC<CardProps> = ({ icon: Icon, title, text, colors }) => (
 // --- 4. MAIN ABOUT COMPONENT ---
 // ===================================================================
 const About: FC = () => {
-    const { theme } = useTheme();
-
     const palette = {
         light: {
             pageBg: 'transparent',
@@ -119,20 +116,10 @@ const About: FC = () => {
             iconBg: 'rgba(76, 175, 80, 0.1)',
             cardGlow: 'rgba(76, 175, 80, 0.2)',
             iconColor: 'rgb(76, 175, 80)',
-        },
-        dark: {
-            pageBg: 'transparent',
-            mainTitle: 'rgb(220, 225, 230)',
-            cardTitleGreen: 'rgb(102, 187, 106)',
-            softTextColor: 'rgb(168, 178, 193)',
-            surfaceBg: 'rgba(30, 41, 59, 0.7)',
-            iconBg: 'rgba(102, 187, 106, 0.1)',
-            cardGlow: 'rgba(102, 187, 106, 0.25)',
-            iconColor: 'rgb(102, 187, 106)',
         }
     };
 
-    const colors = theme === 'light' ? palette.light : palette.dark;
+    const colors = palette.light;
 
     const coreValues = [
         { icon: ShieldCheck, title: "Integrity", text: "Unyielding ethical standards ensuring honesty and fairness in all actions." },
