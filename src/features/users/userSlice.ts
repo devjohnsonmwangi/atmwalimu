@@ -76,6 +76,10 @@ const userSlice = createSlice({
             const { user, tokens } = action.payload;
             state.user = user;
             state.accessToken = tokens.accessToken;
+            // Mirror commonly used fields for easy access
+            state.id = user.userId;
+            state.role = user.role;
+            state.email = user.email;
             // Persist the accessToken to localStorage for session persistence
             localStorage.setItem('authToken', tokens.accessToken);
         },
@@ -85,6 +89,9 @@ const userSlice = createSlice({
         logOut(state) {
             state.user = null;
             state.accessToken = null;
+            state.id = 0;
+            state.role = '';
+            state.email = '';
             localStorage.removeItem('authToken');
         }
     }

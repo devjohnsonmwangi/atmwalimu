@@ -10,6 +10,7 @@ export default defineConfig(({ mode }) => {
   const isProduction = mode === 'production';
 
   return {
+    base: process.env.VITE_BASE_PATH || '/',
     plugins: [
       react(),
       VitePWA(pwaOptions),
@@ -26,6 +27,8 @@ export default defineConfig(({ mode }) => {
     ].filter(Boolean), // Filters out falsy values if visualizer is conditional
 
     build: {
+      outDir: process.env.VITE_OUT_DIR || 'dist',
+      assetsDir: process.env.VITE_ASSETS_DIR || 'assets',
       // Increase warning limit for chunks. Default is 500KB.
       // This is just a warning, not an error. Aim to keep chunks reasonably sized.
       chunkSizeWarningLimit: 1600, // kB
@@ -89,7 +92,7 @@ export default defineConfig(({ mode }) => {
           }
         : {},
         
-      // If using esbuild for minification:
+  // If using esbuild for minification:
       // esbuild: isProduction ? {
       //   drop: ['console', 'debugger'],
       //   pure: ['Math.random'], // Example of marking functions as pure
@@ -98,9 +101,8 @@ export default defineConfig(({ mode }) => {
       //   minifyWhitespace: true,
       // } : false,
 
-      // Set to false to disable generating Broti-compressed versions of assets.
-      // This can save a little build time if not needed (Vercel handles compression).
-      // reportCompressedSize: false, // Default is true
+      // Disable compressed size reporting to speed up the build pipeline (optional)
+      reportCompressedSize: false,
     },
 
     // --- Optimize Dependencies (for Dev Server Speed) ---

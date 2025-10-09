@@ -50,6 +50,7 @@ export const drawerData: DrawerData[] = [
     // ===================================================================
     { id: 14, name: 'Articles', icon: Newspaper, link: '/articles', adminOnly: false, category: 'Content', iconBgColor: '#16A34A' },
     { id: 15, name: 'Create Article', icon: FilePlus2, link: '/articles/create', adminOnly: false, category: 'Content', iconBgColor: '#2563EB' },
+    { id: 18, name: 'My Submissions', icon: FilePlus2, link: '/dashboard/my-submissions', adminOnly: false, category: 'Content', iconBgColor: '#0EA5E9' },
     // ===================================================================
 
     // --- Admin Category (WITH ONE ADDITION) ---
@@ -57,7 +58,8 @@ export const drawerData: DrawerData[] = [
     { id: 7, name: 'Review Submissions', icon: FileCheck, link: '/dashboard/admin/review-submissions', adminOnly: true, category: 'Admin', iconBgColor: '#F59E42' },
     { id: 8, name: 'Manage Accounts', icon: CircleUserRound, link: '/dashboard/accounts', adminOnly: true, category: 'Admin', iconBgColor: '#A21CAF' },
     // --- NEW ADMIN LINK ---
-    { id: 16, name: 'Manage Categories', icon: Tags, link: '/admin/dashboard', adminOnly: true, category: 'Admin', iconBgColor: '#7E22CE' },
+    { id: 16, name: 'Manage Categories', icon: Tags, link: '/dashboard/admin', adminOnly: true, category: 'Admin', iconBgColor: '#7E22CE' },
+    { id: 17, name: 'Article Moderation', icon: Newspaper, link: '/dashboard/admin/moderation', adminOnly: true, category: 'Admin', iconBgColor: '#F97316' },
 
 
     // --- Support Category (NO CHANGES) ---

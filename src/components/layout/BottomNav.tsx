@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from "../../app/store";
 
 // --- ICON IMPORTS ---
-import { Home, FileText, Newspaper, LayoutDashboard, Award, Star, MoreHorizontal, Info, Mail, HelpCircle, X, LogIn, UserPlus } from 'lucide-react';
+import { Home, FileText, Newspaper, LayoutDashboard, Award, MoreHorizontal, Info, Mail, HelpCircle, X, LogIn, UserPlus } from 'lucide-react';
 
 // --- TYPE DEFINITIONS ---
 interface NavLinkType {
@@ -30,7 +30,8 @@ const MobileMoreSheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ i
   const moreSheetLinks: NavLinkType[] = [
     { to: "/how-it-works", icon: HelpCircle, label: "How It Works" },
     { to: "/about", icon: Info, label: "About Us" }, 
-    { to: "/contactus", icon: Mail, label: "Contact Us" } 
+    { to: "/terms", icon: FileText, label: "Terms" },
+    { to: "/contact", icon: Mail, label: "Contact Us" }
   ];
 
   const sheetLinkClass = (active: boolean) =>
@@ -93,7 +94,7 @@ const BottomNav = () => {
   // Determine which links to show based on login status.
   const mobileLinks = isLoggedIn
     ? [ { to: "/", icon: Home, label: "Home" }, { to: "/documents", icon: FileText, label: "Docs" }, { to: "/articles", icon: Newspaper, label: "Articles" }, { to: "/dashboard", icon: LayoutDashboard, label: "Board" } ]
-    : [ { to: "/", icon: Home, label: "Home" }, { to: "/featured", icon: Award, label: "Featured" }, { to: "/articles", icon: Newspaper, label: "Articles" }, { to: "/subscriptions", icon: Star, label: "Plans" } ];
+  : [ { to: "/", icon: Home, label: "Home" }, { to: "/featured", icon: Award, label: "Featured" }, { to: "/articles", icon: Newspaper, label: "Articles" } ];
 
   // Reusable classes for the nav items
   const linkClass = (active: boolean) => 

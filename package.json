@@ -8,6 +8,7 @@
     "dev": "vite",
     "build": "cross-env NODE_OPTIONS=--max-old-space-size=4096 vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "test": "vitest",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -76,6 +77,9 @@
     "zod": "^4.1.11"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^14.3.1",
+    "@testing-library/user-event": "^14.6.1",
     "@types/file-saver": "^2.0.7",
     "@types/node": "^22.15.21",
     "@types/react": "^18.3.18",
@@ -83,6 +87,7 @@
     "@types/react-lottie": "^1.2.10",
     "@types/react-pdf": "^7.0.0",
     "@types/react-select": "^5.0.1",
+    "@types/redux-mock-store": "^1.5.0",
     "@typescript-eslint/eslint-plugin": "^7.13.1",
     "@typescript-eslint/parser": "^7.13.1",
     "@vercel/node": "^5.2.1",
@@ -94,9 +99,12 @@
     "eslint": "^8.57.0",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.7",
+    "jsdom": "^22.1.0",
     "postcss": "^8.4.39",
+    "redux-mock-store": "^1.5.5",
     "tailwindcss": "^3.4.4",
     "typescript": "^5.2.2",
-    "vite": "^5.3.1"
+    "vite": "^5.3.1",
+    "vitest": "^3.2.4"
   }
 }

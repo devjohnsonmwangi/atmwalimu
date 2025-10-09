@@ -39,15 +39,14 @@ const Footer = () => {
           </div>
 
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
-            {/* Resources Section */}
+            {/* Resources Section (only implemented pages) */}
             <div>
               <h6 className={`text-sm font-semibold uppercase tracking-wider ${mwalimuColors.textSecondary} mb-4`}>Resources</h6>
               <ul className="space-y-2">
-                <li><Link to="/notes" className={`${mwalimuColors.accent} ${mwalimuColors.accentHover} transition-colors duration-300`}>Revision Notes</Link></li>
-                <li><Link to="/videos" className={`${mwalimuColors.accent} ${mwalimuColors.accentHover} transition-colors duration-300`}>Video Lessons</Link></li>
-                <li><Link to="/articles" className={`${mwalimuColors.accent} ${mwalimuColors.accentHover} transition-colors duration-300`}>Articles & Guides</Link></li>
-                <li><Link to="/news" className={`${mwalimuColors.accent} ${mwalimuColors.accentHover} transition-colors duration-300`}>Latest News</Link></li>
-                <li><Link to="/exams" className={`${mwalimuColors.accent} ${mwalimuColors.accentHover} transition-colors duration-300`}>Exam Prep</Link></li>
+                <li><Link to="/" className={`${mwalimuColors.accent} ${mwalimuColors.accentHover} transition-colors duration-300`}>Home</Link></li>
+                <li><Link to="/documents" className={`${mwalimuColors.accent} ${mwalimuColors.accentHover} transition-colors duration-300`}>Services</Link></li>
+                <li><Link to="/articles" className={`${mwalimuColors.accent} ${mwalimuColors.accentHover} transition-colors duration-300`}>Articles</Link></li>
+                <li><Link to="/how-it-works" className={`${mwalimuColors.accent} ${mwalimuColors.accentHover} transition-colors duration-300`}>How It Works</Link></li>
               </ul>
             </div>
 
@@ -56,20 +55,21 @@ const Footer = () => {
               <h6 className={`text-sm font-semibold uppercase tracking-wider ${mwalimuColors.textSecondary} mb-4`}>About Us</h6>
               <ul className="space-y-2">
                 <li><Link to="/about" className={`${mwalimuColors.accent} ${mwalimuColors.accentHover} transition-colors duration-300`}>Our Mission</Link></li>
-                <li><Link to="/team" className={`${mwalimuColors.accent} ${mwalimuColors.accentHover} transition-colors duration-300`}>Our Team</Link></li>
-                <li><Link to="/partners" className={`${mwalimuColors.accent} ${mwalimuColors.accentHover} transition-colors duration-300`}>Partners</Link></li>
+                <li><Link to="/login" className={`${mwalimuColors.accent} ${mwalimuColors.accentHover} transition-colors duration-300`}>Login</Link></li>
+                <li><Link to="/register" className={`${mwalimuColors.accent} ${mwalimuColors.accentHover} transition-colors duration-300`}>Partner With us</Link></li>
                 <li><Link to="/contact" className={`${mwalimuColors.accent} ${mwalimuColors.accentHover} transition-colors duration-300`}>Contact Us</Link></li>
               </ul>
             </div>
 
-            {/* Community Section */}
+            {/* Quick Links & Legal */}
             <div>
-              <h6 className={`text-sm font-semibold uppercase tracking-wider ${mwalimuColors.textSecondary} mb-4`}>Community</h6>
+              <h6 className={`text-sm font-semibold uppercase tracking-wider ${mwalimuColors.textSecondary} mb-4`}>Quick Links</h6>
               <ul className="space-y-2">
-                <li><Link to="/forum" className={`${mwalimuColors.accent} ${mwalimuColors.accentHover} transition-colors duration-300`}>Forum</Link></li>
-                <li><Link to="/discussions" className={`${mwalimuColors.accent} ${mwalimuColors.accentHover} transition-colors duration-300`}>Discussions</Link></li>
-                <li><Link to="/events" className={`${mwalimuColors.accent} ${mwalimuColors.accentHover} transition-colors duration-300`}>Events</Link></li>
-                <li><Link to="/get-involved" className={`${mwalimuColors.accent} ${mwalimuColors.accentHover} transition-colors duration-300`}>Get Involved</Link></li>
+                <li><Link to="/about" className={`${mwalimuColors.accent} ${mwalimuColors.accentHover} transition-colors duration-300`}>About</Link></li>
+                <li><Link to="/contact" className={`${mwalimuColors.accent} ${mwalimuColors.accentHover} transition-colors duration-300`}>Contact</Link></li>
+                <li><Link to="/terms" className={`${mwalimuColors.accent} ${mwalimuColors.accentHover} transition-colors duration-300`}>Terms</Link></li>
+                <li><Link to="/privacy-policy" className={`${mwalimuColors.accent} ${mwalimuColors.accentHover} transition-colors duration-300`}>Privacy</Link></li>
+                <li><Link to="/cookies" className={`${mwalimuColors.accent} ${mwalimuColors.accentHover} transition-colors duration-300`}>Cookies</Link></li>
               </ul>
             </div>
 

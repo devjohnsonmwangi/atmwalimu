@@ -1,8 +1,8 @@
-# ⚖️ Wakili Application: Advocate & Commissioner of Oaths Management System
+# ⚖️ @mwalimu Application: Advocate & Commissioner of Oaths Management System
 
 <<<<<<< HEAD
 ## 🚀 Overview
-The **Wakili Application** is an integrated system designed for **advocates** and **commissioners of oaths**. It streamlines office functions, casework, and client interactions while integrating **AI-powered legal assistance**. The system also features a **legal library** and **diary management**, ensuring seamless operations.
+The **@mwalimu Application** is an integrated system designed for **advocates** and **commissioners of oaths**. It streamlines office functions, casework, and client interactions while integrating **AI-powered legal assistance**. The system also features a **legal library** and **diary management**, ensuring seamless operations.
 
 🛠 **Tech Stack:**
 - **Backend:** Hono (TypeScript) + Drizzle ORM + PostgreSQL 🏛️
@@ -151,7 +151,7 @@ Manage finances effortlessly:
 ### 🛠️ **Development Setup**
 1️⃣ Clone the repository:
 ```bash
- git clone https://github.com/devjohnsonmwangi/wakili-api.git
+ git clone https://github.com/devjohnsonmwangi/mwalimu-api.git
 ```
 
 2️⃣ Install dependencies:
@@ -348,6 +348,6 @@ npm run dev
 The **Wakili Application** is a powerful, AI-driven legal management system that streamlines legal workflows, enhances efficiency, and provides a modernized experience for legal professionals. 🚀⚖️  
 
 🔗 **Get Started Today!**
-🚀 [Repository Link](#)  |  📧 **Contact Us: support@wakiliapp.com**
+🚀 [Repository Link](#)  |  📧 **Contact Us: support@mwalimuapp.com**
 
 >>>>>>> 76734d2 (addded   judiciary  templete)

@@ -2,7 +2,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from 'react-redux';
 
 // --- ICON IMPORTS ---
-import { Home, FileText, Award, Newspaper, Star, LayoutDashboard, DownloadCloud, Menu, ArrowLeft, ArrowRight, ChevronDown, Info, Mail, HelpCircle } from 'lucide-react';
+import { Home, FileText, Award, Newspaper, LayoutDashboard, DownloadCloud, Menu, ArrowLeft, ArrowRight, ChevronDown, Info, Mail, HelpCircle } from 'lucide-react';
 
 // --- COMPONENT IMPORTS ---
 import ProfileDropdown from "./ProfileDropdown";
@@ -46,14 +46,14 @@ const Header = ({ onMobileMenuToggle }: HeaderProps) => {
     { to: "/documents", icon: FileText, label: "Documents", auth: true },
     { to: "/featured", icon: Award, label: "Featured" },
     { to: "/articles", icon: Newspaper, label: "Articles" },
-    { to: "/subscriptions", icon: Star, label: "Subscriptions" },
+  // Subscriptions removed per request
     { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard", auth: true },
   ];
 
   const moreLinks: NavLinkType[] = [
-    { to: "/how-it-works", icon: HelpCircle, label: "How It Works" },
-    { to: "/about", icon: Info, label: "About Us" }, 
-    { to: "/contactus", icon: Mail, label: "Contact Us" } 
+  { to: "/how-it-works", icon: HelpCircle, label: "How It Works" },
+  { to: "/about", icon: Info, label: "About Us" }, 
+  { to: "/contact", icon: Mail, label: "Contact Us" } 
   ];
 
   // Helper function to determine if a nav link is currently active.

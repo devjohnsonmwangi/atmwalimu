@@ -2,14 +2,14 @@ import { FC } from 'react';
 import { Cookie, Settings, Info, CheckCircle, BarChart2, Zap, Globe } from 'lucide-react';
 
 
-import Navbar from '../components/navbar/Navbar'; 
+import Header from '../components/layout/Header';
 //import { Link } from 'react-router-dom';
 
 const CookiePolicyPage: FC = () => {
   const lastUpdatedDate = "Always  updated for  your   safety: cookies policy  are  optional !"; 
-  const appName = "Wakili Application";
-  //const companyWebsite = "https://www.wakiliapp.com"; 
-  const supportEmail = "privacy@wakiliapp.com"; 
+  const appName = "@mwalimu Application";
+  //const companyWebsite = "https://www.mwalimuapp.com"; 
+  const supportEmail = "privacy@mwalimuapp.com"; 
 
   // Helper component for sections
   const Section: FC<{ title: string; children: React.ReactNode; Icon?: React.ComponentType<React.SVGProps<SVGSVGElement>> }> = ({ title, children, Icon }) => (
@@ -26,8 +26,8 @@ const CookiePolicyPage: FC = () => {
 
   return (
     <>
-      <Navbar /> 
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 py-12 sm:py-16 transition-colors duration-300">
+      <Header />
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 pt-14 py-4 sm:py-8 transition-colors duration-300">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <header className="text-center mb-10 md:mb-12">
             <Cookie className="mx-auto h-16 w-16 text-amber-500 dark:text-amber-400 mb-4" />

@@ -159,14 +159,14 @@ const BookAppointmentPage: FC = () => {
       </section>
 
       {/* Help Section */}
-      <section className="bg-slate-200/60 dark:bg-slate-800/60 py-16 px-4 text-center">
+  <section className="bg-slate-200/60 dark:bg-slate-800/60 py-16 px-4 text-center">
         <h3 className="text-2xl font-bold mb-4 text-slate-800 dark:text-slate-100">
           Not Sure Where to Start?
         </h3>
         <p className="text-slate-700 dark:text-slate-300 max-w-xl mx-auto mb-6">
           Our team is ready to help. If you're uncertain which option is best,{' '}
           <Link
-            to="/contactus"
+            to="/contact"
             className="text-emerald-600 dark:text-emerald-400 font-medium underline hover:opacity-90"
           >
             reach out to us

@@ -2,14 +2,14 @@ import { FC } from 'react';
 import { ShieldCheck, FileText, Info } from 'lucide-react'; 
 
 
- import Navbar from '../components/navbar/Navbar'; 
+import Header from '../components/layout/Header';
 import { Link } from 'react-router-dom';
 
 const TermsAndServicesPage: FC = () => {
   const lastUpdatedDate = "10th June  2025"; 
-  const companyName = "WakiliApp Solutions"; 
-  const appName = "Wakili Application";
-  const supportEmail = "support@wakiliapp.com"; 
+  const companyName = "@mwalimu Solutions"; 
+  const appName = "@mwalimu Application";
+  const supportEmail = "support@mwalimuapp.com"; 
   const companyAddress = "143-10300, Kerugoya"; 
 
   // Helper component for sections to maintain consistent styling
@@ -27,8 +27,8 @@ const TermsAndServicesPage: FC = () => {
 
   return (
     <>
-       <Navbar /> 
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 py-12 sm:py-16 transition-colors duration-300">
+      <Header />
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 pt-14 py-4 sm:py-8 transition-colors duration-300">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <header className="text-center mb-10 md:mb-12">
             <FileText className="mx-auto h-16 w-16 text-emerald-500 dark:text-emerald-400 mb-4" />
@@ -190,9 +190,9 @@ const TermsAndServicesPage: FC = () => {
           </div>
         </div>
         <footer className="mt-16 pt-8 border-t border-slate-300 dark:border-slate-700 text-center text-slate-500 dark:text-slate-400 text-sm">
-                              <p>© {new Date().getFullYear()} Wakili Inc. All rights reserved.</p>
+                              <p>© {new Date().getFullYear()} @mwalimu Inc. All rights reserved.</p>
                               <p className="mt-1">
-                                <Link to="/terms" className="hover:text-teal-600 dark:hover:text-teal-400">Terms of Service</Link> | <Link to="/privacy-policy" className="hover:text-teal-600 dark:hover:text-teal-400">Privacy Policy</Link> | <Link to="/contactus" className="hover:text-teal-600 dark:hover:text-teal-400">Contact Us</Link>
+                                <Link to="/terms" className="hover:text-teal-600 dark:hover:text-teal-400">Terms of Service</Link> | <Link to="/privacy-policy" className="hover:text-teal-600 dark:hover:text-teal-400">Privacy Policy</Link> | <Link to="/contact" className="hover:text-teal-600 dark:hover:text-teal-400">Contact Us</Link>
                               </p>
                             </footer>
       </div>

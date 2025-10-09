@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
@@ -22,6 +23,10 @@ import Home from './pages/landingPage/Home.tsx';
 import Register from './pages/register/Register.tsx';
 import Login from './pages/login/Login.tsx';
 import Error from './pages/Error.tsx';
+import About from './pages/landingPage/About';
+import ContactPage from './pages/contact';
+import HowItWorks from './pages/HowItWorks';
+import NotificationsPage from './pages/Notifications';
 
 // --- IMPORT ALL DOCUMENT & LIBRARY COMPONENTS ---
 import AllDocumentsPage from './pages/dashboard/main/managedocs/AllDocumentsPage.tsx';
@@ -47,7 +52,7 @@ import { AdminTicketPage } from './pages/dashboard/main/Tickets/AdminTicketPage.
 //dashboardoverview
 import DashboardPage from './pages/dashboard/DashboardPage.tsx';
 import UserProfilePage from './pages/dashboard/main/Profile.tsx';
-const SettingsPage = () => <div className="p-6"><h1>Settings</h1></div>;
+import SettingsPage from './pages/dashboard/main/SettingsPage';
 import LogoutComponent from './components/logout/logout.tsx';
 
 
@@ -59,8 +64,13 @@ import ArticleDetailPage from './pages/dashboard/main/articles/ArticleDetailPage
 import CreateArticlePage from './pages/dashboard/main/articles/CreateArticlePage.tsx';
 import EditArticlePage from './pages/dashboard/main/articles/EditArticlePage.tsx';
 import AdminDashboardPage from './pages/dashboard/main/articles/AdminDashboardPage.tsx';
+import AdminModerationPage from './pages/dashboard/main/articles/AdminModerationPage.tsx';
+import MySubmissionsPage from './pages/dashboard/main/articles/MySubmissionsPage.tsx';
 import AuthenticatedRoute from './components/auth/AuthenticatedRoute.tsx';
 import ProtectedRoute from './components/auth/ProtectedRoute.tsx';
+import TermsAndServicesPage from './pages/terms.tsx';
+import CookiePolicyPage from './pages/cookies.tsx';
+import PrivacyPolicyPage from './pages/privacypolicy.tsx';
 // ===================================================================
 
 
@@ -71,7 +81,10 @@ const router = createBrowserRouter([
   // Standalone Routes (NO CHANGES HERE)
   { path: 'register', element: <Register />, errorElement: <Error /> },
   { path: 'login', element: <Login />, errorElement: <Error /> },
-  { path: 'account', element: <Account />, errorElement: <Error /> },
+  { path: 'terms', element: <TermsAndServicesPage />, errorElement: <Error /> },
+  //cookies
+  {path:'cookies',element:<CookiePolicyPage/>,errorElement:<Error/>},
+  {path:'privacy-policy',element:<PrivacyPolicyPage/>,errorElement:<Error/>},
   
   // Public-Facing Routes (ADDED PUBLIC ARTICLE ROUTES)
   {
@@ -80,12 +93,16 @@ const router = createBrowserRouter([
     errorElement: <Error />,
     children: [
       { index: true, element: <Home /> },
+  { path: 'about', element: <About /> },
+  { path: 'contact', element: <ContactPage /> },
+  { path: 'how-it-works', element: <HowItWorks /> },
       { path: 'documents', element: <AllDocumentsPage /> },
       { path: 'featured', element: <FeaturedDocumentsPage /> },
       
       // --- NEWLY ADDED PUBLIC ARTICLE ROUTES ---
       { path: 'articles', element: <ArticleListPage /> },
       { path: 'articles/:slug', element: <ArticleDetailPage /> },
+      { path: 'notifications', element: <NotificationsPage /> },
     ],
   },
 
@@ -114,7 +131,8 @@ const router = createBrowserRouter([
       {
         element: <DashboardLayout />, // Use the dashboard layout for the admin area
         children: [
-            { path: 'admin/dashboard', element: <AdminDashboardPage /> },
+            { path: 'dashboard/admin', element: <AdminDashboardPage /> },
+      { path: 'dashboard/admin/moderation', element: <AdminModerationPage /> },
         ]
       }
     ]
@@ -148,11 +166,18 @@ const router = createBrowserRouter([
       { path: 'support-tickets/:id', element: <UserTicketPage /> },
       { path: 'admin/support-tickets', element: <SupportTicketList isAdmin={true} /> },
       { path: 'admin/support-tickets/:id', element: <AdminTicketPage /> },
-      
+
+      //dashboard document  this  will  help  in  navigating  to  documents  while  in  the dashbaord 
+      { path: 'dashboard/documents', element: <AllDocumentsPage /> },
+  { path: 'my-submissions', element: <MySubmissionsPage /> },
+    
+
       // General Routes
+
       { path: 'profile', element: <UserProfilePage /> },
       { path: 'settings', element: <SettingsPage /> },
       { path: 'logout', element: <LogoutComponent /> },
+      { path: 'notifications', element: <NotificationsPage /> },
     ],
   },
 

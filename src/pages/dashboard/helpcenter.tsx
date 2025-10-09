@@ -562,7 +562,7 @@ const HelpCenter: React.FC = () => {
       <div className="max-w-4xl mx-auto">
         <header className="mb-10 text-center">
           <HelpCircle size={48} className="mx-auto text-teal-600 dark:text-teal-400 mb-4" />
-          <h1 className="text-4xl font-bold text-slate-800 dark:text-white">Wakili App Help Center</h1>
+          <h1 className="text-4xl font-bold text-slate-800 dark:text-white">@mwalimu App Help Center</h1>
           <p className="text-lg text-slate-600 dark:text-slate-300 mt-3 max-w-2xl mx-auto">
             Here is extensive information to help you. Search below or browse by category.
             If you can't find Help, our support team is ready to assist. Click  on  install  app  button  to  get  our  app  if  you  haven't
@@ -617,7 +617,7 @@ const HelpCenter: React.FC = () => {
             </ul>
             <p className="mt-4">If you've tried these and still can't find an answer:</p>
             <Link
-              to="/contactus"
+              to="/contact"
               className="inline-flex items-center mt-4 bg-teal-600 hover:bg-teal-700 text-white py-2.5 px-6 rounded-lg transition-colors text-lg font-medium shadow-md hover:shadow-lg"
             >
               <Mail size={20} className="mr-2"/> Contact Our Support Team
@@ -635,9 +635,9 @@ const HelpCenter: React.FC = () => {
               <Phone size={22} className="text-white mr-2.5" />
               0112810203
             </a>
-            <a href="mailto:supportwakili@gmail.com" className="flex items-center bg-white/20 hover:bg-white/30 transition-colors p-3 rounded-lg text-lg">
+            <a href="mailto:support@mwalimuapp.com" className="flex items-center bg-white/20 hover:bg-white/30 transition-colors p-3 rounded-lg text-lg">
               <Mail size={22} className="text-white mr-2.5" />
-              supportwakili@gmail.com
+              support@mwalimuapp.com
             </a>
           </div>
           <div className="text-center mt-8">
@@ -651,9 +651,9 @@ const HelpCenter: React.FC = () => {
         </section>
 
         <footer className="mt-16 pt-8 border-t border-slate-300 dark:border-slate-700 text-center text-slate-500 dark:text-slate-400 text-sm">
-          <p>© {new Date().getFullYear()} Wakili Inc. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} @mwalimu Inc. All rights reserved.</p>
           <p className="mt-1">
-            <Link to="/terms" className="hover:text-teal-600 dark:hover:text-teal-400">Terms of Service</Link> | <Link to="/privacy-policy" className="hover:text-teal-600 dark:hover:text-teal-400">Privacy Policy</Link> | <Link to="/contactus" className="hover:text-teal-600 dark:hover:text-teal-400">Contact Us</Link>
+            <Link to="/terms" className="hover:text-teal-600 dark:hover:text-teal-400">Terms of Service</Link> | <Link to="/privacy-policy" className="hover:text-teal-600 dark:hover:text-teal-400">Privacy Policy</Link> | <Link to="/contact" className="hover:text-teal-600 dark:hover:text-teal-400">Contact Us</Link>
           </p>
         </footer>
       </div>

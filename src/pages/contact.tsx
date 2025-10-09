@@ -8,7 +8,8 @@ import {
   ChevronRight,
   Building
 } from 'lucide-react';
-import Navbar from "../components/navbar/Navbar";
+import Header from "../components/layout/Header";
+import Footer from "./landingPage/Footer";
 
 // --- Data for the contact method cards for easy maintenance ---
 const contactMethods = [
@@ -16,7 +17,7 @@ const contactMethods = [
     icon: Ticket,
     title: "Submit a Support Ticket",
     description: "Best for specific case inquiries, technical issues, or billing questions. Our team will get back to you with a detailed response.",
-    link: "/dashboard/mytickets",
+    link: "/dashboard/support-tickets",
     buttonText: "Go to My Tickets"
   },
   {
@@ -28,17 +29,18 @@ const contactMethods = [
   },
   {
     icon: Building,
-    title: "Find a Branch",
-    description: "Need to speak with someone in person or find a direct phone number? Locate your nearest branch for address and contact details.",
-    link: "/dashboard/branch",
-    buttonText: "View Branch Locations"
+    title: " Contact Us Directly",
+    description: "Call 0112810203 or email jomultd@gmail.com for branch enquiries.",
+    link: "jomulimited2@gmail.com",
+    buttonText: "Email Us"
   }
 ];
 
 const ContactPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 dark:from-slate-900 dark:to-slate-950 font-sans">
-      <Navbar />
+      <Header />
+      <div className="pt-14" />
 
       {/* Main content area with padding to avoid navbars */}
       <main className="pt-16 pb-16 lg:pb-0">
@@ -99,19 +101,20 @@ const ContactPage = () => {
                 <Phone className="w-5 h-5 mr-2" />
                 <span>+254 112 810 203</span>
               </a>
-              <a href="mailto:info@wakili.com" className="flex items-center hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+              <a href="mailto:info@mwalimu.com" className="flex items-center hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
                 <Mail className="w-5 h-5 mr-2" />
-                <span>info@wakili.com</span>
+                <span>info@mwalimu.com</span>
               </a>
-              <a href="https://maps.google.com/?q=123+Wakili+Street,+Nairobi,+Kenya" target="_blank" rel="noopener noreferrer" className="flex items-center hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+          <a href="https://maps.google.com/?q=123+Mwalimu+Street,+Nairobi,+Kenya" target="_blank" rel="noopener noreferrer" className="flex items-center hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
                  <MapPin className="w-5 h-5 mr-2" />
-                 <span>143-10300, Kerugoya</span>
+            <span>143-10300, Kerugoya</span>
               </a>
             </div>
           </div>
 
         </section>
       </main>
+      <Footer />
     </div>
   );
 };

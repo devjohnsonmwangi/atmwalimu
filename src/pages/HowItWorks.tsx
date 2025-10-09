@@ -1,125 +1,43 @@
 import React from "react";
 //import Footer from "../pages/landingPage/Footer"; 
-import Navbar from "../components/navbar/Navbar";
+import Header from "../components/layout/Header";
 import { Link } from "react-router-dom";
 import {
-    FaUserCheck, FaListAlt, FaFileSignature, FaCalendarAlt,
-    FaFileContract, FaComments, FaSmile, FaQuestionCircle, FaQuoteLeft
+    FaQuestionCircle, FaQuoteLeft
 } from "react-icons/fa";
-import { ChevronRight, ShieldCheck, Zap, Users
-} from "lucide-react";
+import { ChevronRight } from "lucide-react";
+import howItWorksConfig from '../config/howItWorksContent';
 
 // --- INTERFACES ---
 
-interface StepContent {
-    step: number;
-    imageUrl: string; 
-    title: string;
-    icon: React.ReactElement;
-    description: string;
-}
-
-interface Benefit {
-    icon: React.ReactElement;
-    title: string;
-    description: string;
-}
-
-// --- DATA ARRAYS WITH CORRECTED, STABLE IMAGE URLS ---
-
-const stepsData: StepContent[] = [
-    {
-        step: 1, 
-        // A professional person working on a laptop, signifying creating a profile.
-        imageUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2",
-        title: "Sign Up & Create Profile",
-        icon: <FaUserCheck className="w-6 h-6" />,
-        description: "Embark on your legal journey by creating a secure Wakili profile. Share your needs, and we'll personalize your experience from the start."
-    },
-    {
-        step: 2, 
-        // A magnifying glass over documents, signifying discovery/search.
-        imageUrl: "https://blog.careerlauncher.com/wp-content/uploads/2021/07/lawopportunities.jpg",
-        title: "Discover Your Legal Solution",
-        icon: <FaListAlt className="w-6 h-6" />,
-        description: "Explore a comprehensive suite of legal services. From property agreements to intricate contracts, find the precise support you require with ease."
-    },
-    {
-        step: 3, 
-        // A person using a digital calendar to book an appointment.
-        imageUrl: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe",
-        title: "Book Your Expert Consultation",
-        icon: <FaFileSignature className="w-6 h-6" />,
-        description: "Seamlessly schedule a consultation with a seasoned legal expert. Select a convenient time, and receive instant confirmation for your appointment."
-    },
-    {
-        step: 4, 
-        // A professional meeting/consultation in progress.
-        imageUrl: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7",
-        title: "Engage in Your Consultation",
-        icon: <FaCalendarAlt className="w-6 h-6" />,
-        description: "Connect with your lawyer for a confidential discussion. Ask questions, gain clarity, and outline your specific legal objectives in a secure environment."
-    },
-    {
-        step: 5, 
-        // Hands exchanging a signed document, representing contract delivery.
-        imageUrl: "https://images.pexels.com/photos/357514/pexels-photo-357514.jpeg?cs=srgb",
-        title: "Receive Expertly Drafted Documents",
-        icon: <FaFileContract className="w-6 h-6" />,
-        description: "Our legal professionals will meticulously prepare all necessary documents, ensuring accuracy and compliance, ready for your review and approval."
-    },
-    {
-        step: 6, 
-        // A person providing customer support via headset, signifying ongoing help.
-        imageUrl: "https://www.ikonixusa.com/media/wysiwyg/Ongoing-Support-Icon.png",
-        title: "Benefit from Ongoing Support",
-        icon: <FaComments className="w-6 h-6" />,
-        description: "Experience continuous support throughout your legal process. Our dedicated team is readily available for any clarifications, revisions, or further assistance."
-    },
-    {
-        step: 7, 
-        // Hand signing a document with house keys, signifying finalization and peace of mind.
-        imageUrl: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?fm=jpg",
-        title: "Achieve Legal Peace of Mind",
-        icon: <FaSmile className="w-6 h-6" />,
-        description: "Finalize your legal matters with confidence. Receive your completed documents and a clear understanding of your empowered legal standing and future protection."
-    },
-];
-
-const benefitsData: Benefit[] = [
-    {
-        icon: <Zap className="w-8 h-8 text-purple-500 dark:text-purple-400" />,
-        title: "Lightning Fast Process",
-        description: "Navigate legal complexities quicker than ever with our optimized digital workflows and responsive experts."
-    },
-    {
-        icon: <ShieldCheck className="w-8 h-8 text-green-500 dark:text-green-400" />,
-        title: "Secure & Confidential",
-        description: "Your data and communications are protected with bank-grade security and strict confidentiality protocols."
-    },
-    {
-        icon: <Users className="w-8 h-8 text-blue-500 dark:text-blue-400" />,
-        title: "Expert Guidance at Every Step",
-        description: "Access a network of vetted legal professionals ready to provide tailored advice and support."
-    }
-];
+// import the dynamic config
+const { stepsData, benefitsData } = howItWorksConfig;
 
 // --- COMPONENTS ---
+
+type StepContent = {
+    step: number;
+    imageUrl: string;
+    title: string;
+    icon: React.ReactNode;
+    description: string;
+};
 
 function HowItWorks() {
     return (
         <div className="bg-gray-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 min-h-screen flex flex-col transition-colors duration-300">
-            <Navbar />
+            <Header />
+            <div className="pt-14" />
 
             <main className="flex-grow px-4 sm:px-6 py-16 sm:py-24">
                 <div className="text-center mb-16 sm:mb-20">
                     <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4">
                         <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 dark:from-purple-400 dark:via-pink-400 dark:to-orange-400 animate-fade-in">
-                            How Wakili Works
+                            How @mwalimu Works
                         </span>
                     </h1>
                     <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                        Navigating legal matters can be complex. At Wakili, we've simplified the entire process into clear, manageable steps, connecting you with expert legal help efficiently and transparently.
+                        Navigating learning can be complex. At @mwalimu, we've simplified the entire process into clear, manageable steps, connecting learners and educators efficiently and transparently.
                     </p>
                 </div>
 
@@ -135,14 +53,14 @@ function HowItWorks() {
                     ))}
                 </div>
 
-                {/* Why Choose Wakili Section */}
+                {/* Why Choose @mwalimu Section */}
                 <section className="py-16 sm:py-24 mt-16 sm:mt-20 bg-white dark:bg-slate-800/50 rounded-xl shadow-xl">
                     <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center">
                         <h2 className="text-3xl sm:text-4xl font-bold text-slate-800 dark:text-white mb-4">
-                            Why Streamline Your Legal Needs with <span className="text-purple-600 dark:text-purple-400">Wakili?</span>
+                            Why Streamline Your Learning with <span className="text-purple-600 dark:text-purple-400">@mwalimu?</span>
                         </h2>
-                        <p className="text-lg text-slate-600 dark:text-slate-400 mb-12 max-w-2xl mx-auto">
-                            We're committed to making legal services accessible, understandable, and stress-free.
+                            <p className="text-lg text-slate-600 dark:text-slate-400 mb-12 max-w-2xl mx-auto">
+                            We're committed to making services accessible, understandable, and stress-free.
                         </p>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12">
                             {benefitsData.map((benefit, index) => (
@@ -167,12 +85,12 @@ function HowItWorks() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div className="p-6 bg-white dark:bg-slate-800 rounded-lg shadow-lg">
                                 <FaQuoteLeft className="text-3xl text-purple-400 dark:text-purple-300 mb-4 opacity-50" />
-                                <p className="text-slate-600 dark:text-slate-300 italic mb-4">"Wakili made the daunting process of contract review so simple! The platform is intuitive, and the lawyers were incredibly helpful."</p>
+                                <p className="text-slate-600 dark:text-slate-300 italic mb-4">"@mwalimu made learning so simple! The platform is intuitive, and the resources were incredibly helpful."</p>
                                 <p className="font-semibold text-slate-700 dark:text-white">- Alex P., Small Business Owner</p>
                             </div>
                             <div className="p-6 bg-white dark:bg-slate-800 rounded-lg shadow-lg">
                                 <FaQuoteLeft className="text-3xl text-purple-400 dark:text-purple-300 mb-4 opacity-50" />
-                                <p className="text-slate-600 dark:text-slate-300 italic mb-4">"Booking a consultation was a breeze, and I got the expert advice I needed without any hassle. Highly recommend Wakili!"</p>
+                                <p className="text-slate-600 dark:text-slate-300 italic mb-4">"Booking a consultation was a breeze, and I got the expert advice I needed without any hassle. Highly recommend @mwalimu!"</p>
                                 <p className="font-semibold text-slate-700 dark:text-white">- Sarah K., Individual Client</p>
                             </div>
                         </div>
@@ -189,7 +107,7 @@ function HowItWorks() {
                             <div>
                                 <h3 className="text-xl font-semibold text-slate-700 dark:text-white mb-2 flex items-center">
                                     <FaQuestionCircle className="w-6 h-6 mr-3 text-purple-500 dark:text-purple-400" />
-                                    Is my information secure on Wakili?
+                                    Is my information secure on @mwalimu?
                                 </h3>
                                 <p className="text-slate-600 dark:text-slate-300 pl-9">
                                     Absolutely. We use state-of-the-art encryption and security protocols to protect all your personal information and case details. Your privacy is our top priority.
@@ -198,7 +116,7 @@ function HowItWorks() {
                             <div>
                                 <h3 className="text-xl font-semibold text-slate-700 dark:text-white mb-2 flex items-center">
                                     <FaQuestionCircle className="w-6 h-6 mr-3 text-purple-500 dark:text-purple-400" />
-                                    How are lawyers on Wakili vetted?
+                                    How are contributors on @mwalimu vetted?
                                 </h3>
                                 <p className="text-slate-600 dark:text-slate-300 pl-9">
                                     All legal professionals on our platform undergo a rigorous verification process, including checks for qualifications, experience, and professional standing, to ensure you receive high-quality service.
@@ -220,10 +138,10 @@ function HowItWorks() {
             </main>
 
             <footer className="mt-16 pt-8 border-t border-slate-300 dark:border-slate-700 text-center text-slate-500 dark:text-slate-400 text-sm">
-                      <p>© {new Date().getFullYear()} Wakili Inc. All rights reserved.</p>
-                      <p className="mt-1">
-                        <Link to="/terms" className="hover:text-teal-600 dark:hover:text-teal-400">Terms of Service</Link> | <Link to="/privacy-policy" className="hover:text-teal-600 dark:hover:text-teal-400">Privacy Policy</Link> | <Link to="/contactus" className="hover:text-teal-600 dark:hover:text-teal-400">Contact Us</Link>
-                      </p>
+                      <p>© {new Date().getFullYear()} @mwalimu Inc. All rights reserved.</p>
+                                                <p className="mt-1">
+                                                <Link to="/terms" className="hover:text-teal-600 dark:hover:text-teal-400">Terms of Service</Link> | <Link to="/privacy-policy" className="hover:text-teal-600 dark:hover:text-teal-400">Privacy Policy</Link> | <Link to="/contact" className="hover:text-teal-600 dark:hover:text-teal-400">Contact Us</Link>
+                                            </p>
             </footer>
         </div>
     );

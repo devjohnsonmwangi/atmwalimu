@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useGetArticlesQuery } from '../../../../features/articles/articlesApi';
 import ArticleCard from '../../../../components/articles/ArticleCard';
-import ArticleListSkeleton from '../../../../components/articles/ArticleDetailSkeleton';
+import ArticleListSkeleton from '../../../../components/articles/ArticleListSkeleton';
 
 const ArticleListPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -77,13 +77,13 @@ const ArticleListPage: React.FC = () => {
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen">
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight">
-            The Knowledge Hub
+    <div className="bg-base-100 min-h-screen styled-scrollbar">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <div className="text-center mb-8 sm:mb-12">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-blue-600 tracking-tight">
+            <span className="underline-border-hover">The Knowledge Hub</span>
           </h1>
-          <p className="mt-4 max-w-2xl mx-auto text-lg text-gray-500">
+          <p className="mt-3 max-w-2xl mx-auto text-sm sm:text-lg text-gray-500">
             Insights, tutorials, and updates from our team.
           </p>
         </div>

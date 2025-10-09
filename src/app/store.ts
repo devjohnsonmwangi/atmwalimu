@@ -20,8 +20,7 @@ import { articlesApi } from "../features/articles/articlesApi";
 import { logAPI } from "../features/log/logsapi";
 
 import { supportTicketApi } from "../features/Tickets/AllTickets";
-import { eventAndReminderAPI } from "../features/events/events";
-import { eventReminderAPI } from "../features/events/eventreminder";
+
 
 import { documentsApi } from "../features/documents/docmentsApi";
 
@@ -50,8 +49,7 @@ const persistConfig = {
         logAPI.reducerPath,
     
         supportTicketApi.reducerPath,
-        eventAndReminderAPI.reducerPath,
-        eventReminderAPI.reducerPath,
+
 
         documentsApi.reducerPath,
     
@@ -76,8 +74,7 @@ const rootReducer = combineReducers({
     [logAPI.reducerPath]: logAPI.reducer,
     
     [supportTicketApi.reducerPath]: supportTicketApi.reducer,
-    [eventAndReminderAPI.reducerPath]: eventAndReminderAPI.reducer,
-    [eventReminderAPI.reducerPath]: eventReminderAPI.reducer,
+
     
     [documentsApi.reducerPath]: documentsApi.reducer,
     
@@ -110,9 +107,7 @@ export const store = configureStore({
             logAPI.middleware,
     
             supportTicketApi.middleware,
-            eventAndReminderAPI.middleware,
-            eventReminderAPI.middleware,
-            
+       
             documentsApi.middleware,
             
             authApi.middleware,

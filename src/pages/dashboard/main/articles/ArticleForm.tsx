@@ -1,12 +1,18 @@
 // src/features/articles/ArticleForm.tsx
 import React, { useState, useEffect } from 'react';
-import { useGetCategoriesQuery } from './articlesApi';
-import type { Article, CreateArticleDto } from './articlesApi';
-import Spinner from '../../components/Spinner';
+import type { Article } from '../../../../features/articles/articlesApi';
+// Spinner was unused and the component doesn't rely on it; remove import
+
+interface ArticleFormSubmit {
+  title: string;
+  content: string;
+  excerpt?: string | null;
+  status?: 'draft' | 'published';
+}
 
 interface ArticleFormProps {
   articleToEdit?: Article;
-  onSubmit: (data: CreateArticleDto | Partial<CreateArticleDto>) => void;
+  onSubmit: (data: ArticleFormSubmit) => void;
   isSaving: boolean;
   onCancel: () => void;
 }
@@ -23,14 +29,17 @@ const ArticleForm: React.FC<ArticleFormProps> = ({ articleToEdit, onSubmit, isSa
     if (articleToEdit) {
       setTitle(articleToEdit.title);
       setContent(articleToEdit.content);
-      setExcerpt(articleToEdit.excerpt);
-      setStatus(articleToEdit.status);
+      setExcerpt(articleToEdit.excerpt ?? '');
+      // articleToEdit.status might be undefined in the public Article type
+  // The public Article type may not include `status` in some responses; check safely
+  const maybeStatus = (articleToEdit as Article & { status?: 'draft' | 'published' }).status;
+  if (maybeStatus) setStatus(maybeStatus);
     }
   }, [articleToEdit]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ title, content, excerpt, status });
+  onSubmit({ title, content, excerpt, status });
   };
 
   return (

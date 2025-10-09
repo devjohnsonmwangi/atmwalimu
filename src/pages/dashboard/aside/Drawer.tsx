@@ -94,12 +94,22 @@ const Drawer: FC<DrawerProps> = ({ isMobileOpen, onMobileClose }) => {
       >
         {/* Drawer Header */}
         <div className="flex justify-between items-center p-4 border-b border-base-300 shrink-0 h-14">
-          <h5
-            id="drawer-title"
-            className="text-2xl font-fancy-lobster text-primary tracking-wide"
-          >
-            Navigation
-          </h5>
+          <div className="flex flex-col">
+            <h5
+              id="drawer-title"
+              className="text-2xl font-fancy-lobster text-primary tracking-wide"
+            >
+              Navigation
+            </h5>
+            {/* Role badge - shows current user role or 'Guest' */}
+            <div className="mt-1">
+              {user?.user?.role ? (
+                <span className="text-xs font-semibold uppercase px-2 py-0.5 rounded bg-blue-100 text-blue-700">{user.user.role}</span>
+              ) : (
+                <span className="text-xs font-medium px-2 py-0.5 rounded bg-gray-100 text-gray-600">Guest</span>
+              )}
+            </div>
+          </div>
           {/* Close button ONLY appears on small screens */}
           <button
             title="Close menu"

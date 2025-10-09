@@ -28,8 +28,8 @@ const AIChatBox: React.FC = () => {
     <div className="flex flex-col h-[600px] w-full max-w-md bg-white shadow-lg rounded-lg overflow-hidden relative">
       {/* Chat Header */}
       <div className="bg-gradient-to-r from-button-gradient-start to-button-gradient-end text-white p-4 text-center font-bold text-lg flex justify-center items-center">
-        <AiOutlineRobot className="mr-2 text-2xl animate-spin-slow" /> 
-        <span className="animate-twinkle">Wakili AI Assistant</span>
+  <AiOutlineRobot className="mr-2 text-2xl animate-spin-slow" /> 
+  <span className="animate-twinkle">@mwalimu AI Assistant</span>
       </div>
 
       {/* Chat Messages */}

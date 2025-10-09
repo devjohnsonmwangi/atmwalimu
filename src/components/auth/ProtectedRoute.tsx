@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { Navigate, Outlet } from 'react-router-dom';
-import type { RootState } from '../../app/store'; // Adjust the path to your Redux store if needed
+import { selectIsAuthenticated, selectUserRole } from '../../features/users/userSlice';
 
 /**
  * A component that acts as a route guard for admin users only.
@@ -17,11 +17,12 @@ import type { RootState } from '../../app/store'; // Adjust the path to your Red
  * (e.g., managing users, viewing site-wide analytics, managing categories).
  */
 const ProtectedRoute: React.FC = () => {
-  // Select the entire user object to check for both token and role.
-  const user = useSelector((state: RootState) => state.user);
+  // Use selectors to derive authentication and role information from the user slice.
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const userRole = useSelector(selectUserRole);
 
   // Check for authentication AND authorization (admin role).
-  if (!user.accessToken || user.role !== 'admin') {
+  if (!isAuthenticated || userRole !== 'admin') {
     // If the user is not logged in or is not an admin, redirect them.
     // The `replace` prop ensures the protected route is not in the browser's history.
     return <Navigate to="/login" replace />;

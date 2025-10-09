@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useState, useContext, ReactNode } from 'react';
 
 // 1. Define the shape of a user object

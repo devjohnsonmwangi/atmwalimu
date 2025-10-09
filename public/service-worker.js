@@ -2,12 +2,11 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open('@mwalimu-cache').then((cache) => {
       return cache.addAll([
-        '/',
-        '/index.html',
-        '/manifest.json',
-        "https://wakilifrontend.vercel.app/wakililogo.png",
-        "https://wakilifrontend.vercel.app/wakililogo.png"
-      ]);
+          '/',
+          '/index.html',
+          '/manifest.json',
+          '/atmwalimulogo.png'
+        ]);
     })
   );
 });

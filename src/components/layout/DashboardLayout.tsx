@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Header from './Header'; 
 import AppDrawer from '../../pages/dashboard/aside/Drawer';
+import BottomNav from './BottomNav';
 // --- 1. IMPORT THE HISTORY TRACKER ---
 // Make sure this path is correct for your project structure.
 import HistoryTracker from '../../components/RouteChangeTracker';
@@ -65,6 +66,8 @@ const DashboardLayout = () => {
           </div>
         </main>
       </div>
+      {/* Bottom nav for mobile - mirrors AppLayout behavior */}
+      <BottomNav />
     </div>
   );
 };

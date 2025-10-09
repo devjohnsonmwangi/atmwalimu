@@ -4,8 +4,8 @@ export const pwaOptions: Partial<VitePWAOptions> = {
   registerType: 'autoUpdate',
   includeAssets: ['favicon.svg', 'robots.txt', 'apple-touch-icon.png'],
   manifest: {
-    name: '@Mwalimu',
-    short_name: '@Mwalimu',
+  name: '@Mwalimu',
+  short_name: '@Mwalimu',
     description: 'Your Ultimate Educational Companion',
     theme_color: '#ffffff',
     background_color: '#ffffff',
@@ -14,17 +14,17 @@ export const pwaOptions: Partial<VitePWAOptions> = {
     start_url: '/',
     icons: [
       {
-        src: 'https://wakilifrontend.vercel.app/atmwalimulogo.png',
+        src: '/atmwalimulogo.png',
         sizes: '192x192',
         type: 'image/png',
       },
       {
-        src: 'https://wakilifrontend.vercel.app/atmwalimulogo.png',
+        src: '/atmwalimulogo.png',
         sizes: '512x512',
         type: 'image/png',
       },
       {
-        src: 'https://wakilifrontend.vercel.app/atmwalimulogo.png',
+        src: '/atmwalimulogo.png',
         sizes: '512x512',
         type: 'image/png',
         purpose: 'any maskable',

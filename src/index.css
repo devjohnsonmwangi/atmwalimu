@@ -2,15 +2,13 @@
 
 /* --- 1. Font Import --- */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+/* --- 2. Third-party CSS (must come before Tailwind directives) --- */
+@import 'react-quill/dist/quill.snow.css';
 
-/* --- 2. Core Tailwind Imports --- */
+/* --- 3. Core Tailwind Imports --- */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* In your global CSS file, e.g., src/index.css */
-@import 'react-quill/dist/quill.snow.css'; 
-
 /* Optional: Add some custom styling to make it fit better */
 .ql-editor {
   min-height: 300px;
@@ -100,6 +98,30 @@
   }
   .react-datepicker__day--disabled {
     @apply text-base-content/40; /* 40% opacity */
+  }
+}
+
+/* Animated green bottom-border for headlines */
+@layer components {
+  .underline-border-hover {
+    position: relative;
+    display: inline-block;
+  }
+  .underline-border-hover::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    height: 3px;
+    width: 0;
+    background: #10B981; /* emerald-500 */
+    transition: width 180ms ease-in-out;
+    border-radius: 2px;
+  }
+  .underline-border-hover:hover::after,
+  .underline-border-hover:focus::after,
+  .underline-border-hover.group-hover\:underline-border-hover::after {
+    width: 100%;
   }
 }
 

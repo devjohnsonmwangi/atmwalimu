@@ -12,9 +12,8 @@ import { useGetUserByIdQuery, useUpdateUserMutation, UserUpdatePayload} from '..
 import { ProfileSkeleton } from '../../../components/skeltons/ProfileSkeleton';
 
 // --- Cloudinary Configuration ---
-// Recommended: Move to environment variables for production
-const CLOUDINARY_CLOUD_NAME = 'dw4hohfsr'; // Replace with your Cloudinary cloud name
-const CLOUDINARY_UPLOAD_PRESET = 'johnson'; // Replace with your Cloudinary upload preset
+// Values are centralized in src/utils/cloudinary.ts
+import { CLOUDINARY_CLOUD_NAME, CLOUDINARY_UPLOAD_PRESET } from '../../../utils/cloudinary';
 
 // --- Type Definitions ---
 interface User {

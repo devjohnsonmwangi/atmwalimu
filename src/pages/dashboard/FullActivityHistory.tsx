@@ -110,21 +110,21 @@
 //     setIsLoading(false);
 //   };
 
-//   useEffect(() => {
+//     useEffect(() => {
 //     fetchHistory();
 
 //     const handleStorageUpdate = () => fetchHistory();
-//     window.addEventListener('wakiliStorageUpdated', handleStorageUpdate);
+//     window.addEventListener('mwalimuStorageUpdated', handleStorageUpdate);
 //     window.addEventListener('storage', (event) => {
-//         if (event.key === 'wakiliAppRecentPages') {
+//         if (event.key === 'mwalimuAppRecentPages') {
 //             fetchHistory();
 //         }
 //     });
 
 //     return () => {
-//       window.removeEventListener('wakiliStorageUpdated', handleStorageUpdate);
+//       window.removeEventListener('mwalimuStorageUpdated', handleStorageUpdate);
 //       window.removeEventListener('storage', (event) => {
-//         if (event.key === 'wakiliAppRecentPages') fetchHistory();
+//         if (event.key === 'mwalimuAppRecentPages') fetchHistory();
 //       });
 //     };
 //   }, []);
