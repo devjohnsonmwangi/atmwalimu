@@ -9,6 +9,7 @@ type Notification = {
   createdAt: string;
   read?: boolean;
 };
+// Sample notifications for demonstration
 
 const sampleNotifications: Notification[] = [
   { id: '1', title: 'Welcome to @mwalimu', body: 'Thanks for joining — explore articles and services to get started.', createdAt: new Date().toISOString(), read: false },
