@@ -7,6 +7,7 @@ import Spinner from '../../../../components/Spinner';
 import DocumentPreviewer from '../../../../components/documents/DocumentPreviewer'; // <-- Import the previewer
 import { Document } from '../../../../features/documents/docmentsApi';
 import { X } from 'lucide-react'; // <-- Import close icon
+import ReloadButton from '../../../../components/ui/ReloadButton';
 
 const MyLibraryPage: React.FC = () => {
   const { data: myLibrary, error, isLoading } = useFetchMyLibraryQuery();
@@ -90,14 +91,20 @@ const MyLibraryPage: React.FC = () => {
       <div className="bg-white min-h-screen">
         <div className="w-full mx-auto px-2 sm:px-4">
           <div className="py-4 sm:py-6 mb-4 border-b">
-            <h1 className="relative group w-fit text-3xl sm:text-4xl font-bold font-poppins text-blue-600">
-              My Library
-              <span 
-                className="absolute bottom-0 left-0 w-full h-1 bg-green-500 
-                           transform scale-x-0 group-hover:scale-x-100 
-                           transition-transform duration-300 ease-out"
-              ></span>
-            </h1>
+            <div className="flex items-center gap-4">
+              <h1 className="relative group w-fit text-3xl sm:text-4xl font-bold font-poppins text-blue-600">
+                My Library
+                <span 
+                  className="absolute bottom-0 left-0 w-full h-1 bg-green-500 
+                             transform scale-x-0 group-hover:scale-x-100 
+                             transition-transform duration-300 ease-out"
+                ></span>
+              </h1>
+              <div className="ml-2">
+                <ReloadButton />
+              </div>
+            </div>
+            
             <p className="text-gray-600 mt-1 font-poppins text-sm sm:text-base">All your purchased documents in one place.</p>
           </div>
           
