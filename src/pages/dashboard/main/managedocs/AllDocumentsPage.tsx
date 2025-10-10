@@ -6,6 +6,7 @@ import DocumentList from '../../../../components/documents/DocumentList'; // Cor
 import Button from '../../../../components/Button'; // Corrected Path
 import DocumentPreviewer from '../../../../components/documents/DocumentPreviewer'; // <-- IMPORT THE PREVIEWER
 import { Search, X } from 'lucide-react'; // <-- IMPORT X for the close icon
+import ReloadButton from '../../../../components/ui/ReloadButton';
 
 const MAIN_NAV_HEIGHT = '64px';
 
@@ -63,9 +64,14 @@ const AllDocumentsPage: React.FC = () => {
           style={{ top: MAIN_NAV_HEIGHT }}
         >
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="mb-4 md:mb-0 text-center md:text-left">
-              <h1 className="text-3xl md:text-4xl font-bold">Explore Our Document Library</h1>
-              <p className="text-blue-200 mt-1">Find the resources you need.</p>
+            <div className="mb-4 md:mb-0 text-center md:text-left flex items-center gap-3">
+              <div>
+                <h1 className="text-3xl md:text-4xl font-bold">Explore Our Document Library</h1>
+                <p className="text-blue-200 mt-1">Find the resources you need.</p>
+              </div>
+              <div className="ml-3">
+                <ReloadButton />
+              </div>
             </div>
             
             <div className="relative w-full md:w-2/5">

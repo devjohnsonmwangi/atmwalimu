@@ -12,6 +12,7 @@ import DocumentCard from '../../../../components/documents/DocumentCard';
 import Spinner from '../../../../components/Spinner';
 import DocumentPreviewer from '../../../../components/documents/DocumentPreviewer'; // <-- 1. IMPORT PREVIEWER
 import { Library, Inbox, Search, X, ChevronDown } from 'lucide-react';
+import ReloadButton from '../../../../components/ui/ReloadButton';
 
 // --- Reusable Pagination Component ---
 interface PaginationControlsProps {
@@ -116,11 +117,16 @@ const PublicLibraryPage: React.FC = () => {
         <header className="flex-shrink-0 z-30 bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-lg">
             {/* Header content... */}
             <div className="max-w-screen-xl mx-auto px-2 sm:px-4 lg:px-6 py-4">
-              <div className="flex items-center gap-4">
-                <Library className="h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0" strokeWidth={1.5} />
+              <div className="flex items-center gap-4 justify-between w-full">
+                <div className="flex items-center gap-4">
+                  <Library className="h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0" strokeWidth={1.5} />
+                  <div>
+                    <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight">The Public Library</h1>
+                    <p className="mt-1 text-indigo-200 text-base sm:text-lg">Browse our curated collection of documents.</p>
+                  </div>
+                </div>
                 <div>
-                  <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight">The Public Library</h1>
-                  <p className="mt-1 text-indigo-200 text-base sm:text-lg">Browse our curated collection of documents.</p>
+                  <ReloadButton />
                 </div>
               </div>
     

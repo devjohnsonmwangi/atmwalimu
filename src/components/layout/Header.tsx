@@ -7,6 +7,7 @@ import { Home, FileText, Award, Newspaper, LayoutDashboard, DownloadCloud, Menu,
 // --- COMPONENT IMPORTS ---
 import ProfileDropdown from "./ProfileDropdown";
 import { RootState } from "../../app/store";
+import ReloadButton from '../ui/ReloadButton';
 
 // --- HOOKS & UTILS ---
 import { usePWA } from "../../hooks/usePWA";
@@ -119,6 +120,10 @@ const Header = ({ onMobileMenuToggle }: HeaderProps) => {
           <div className="hidden md:flex items-center gap-1 border-r border-base-300 pr-3 mr-1">
             <button onClick={() => navigate(-1)} className={iconButtonClasses} title="Go back"><ArrowLeft className="h-5 w-5" /></button>
             <button onClick={() => navigate(1)} className={iconButtonClasses} title="Go forward"><ArrowRight className="h-5 w-5" /></button>
+          </div>
+          {/* Reload button visible on md+ screens */}
+          <div className="hidden md:block mr-2">
+            <ReloadButton />
           </div>
           
           {shouldShowPWAButton && (

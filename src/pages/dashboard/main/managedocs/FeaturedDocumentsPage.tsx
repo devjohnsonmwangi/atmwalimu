@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { useFetchDocumentsQuery } from '../../../../features/documents/docmentsApi';
 import { Document } from '../../../../features/documents/docmentsApi';
@@ -8,6 +8,7 @@ import DocumentCard from '../../../../components/documents/DocumentCard';
 import Spinner from '../../../../components/Spinner';
 import Button from '../../../../components/Button';
 import { Star, Sparkles, AlertTriangle } from 'lucide-react';
+import ReloadButton from '../../../../components/ui/ReloadButton';
 
 // --- Showcase Card with the new, simplified button logic ---
 const ShowcaseDocumentCard: React.FC<{ document: Document }> = ({ document }) => {
@@ -61,6 +62,7 @@ const ShowcaseDocumentCard: React.FC<{ document: Document }> = ({ document }) =>
 const FeaturedDocumentsPage: React.FC = () => {
   const { data: response, error, isLoading } = useFetchDocumentsQuery({ page: 1, limit: 100 });
   const featuredDocuments = response?.data?.filter(doc => doc.isFeatured);
+  const navigate = useNavigate();
 
   if (isLoading) {
     return <div className="flex justify-center items-center h-screen"><Spinner /></div>;
@@ -84,14 +86,15 @@ const FeaturedDocumentsPage: React.FC = () => {
       <div className="max-w-7xl mx-auto">
 
         {/* --- ELEGANT HEADER (Light Mode) --- */}
-        <div className="text-center border-b-2 border-amber-400 pb-6 mb-12">
-          <Star className="mx-auto h-12 w-12 text-amber-400 mb-4" fill="currentColor" />
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-800 tracking-tight">
-            Featured Documents
-          </h1>
-          <p className="mt-4 max-w-2xl mx-auto text-lg text-gray-600">
-            A curated collection of our top-rated and most valuable resources.
-          </p>
+        <div className="flex items-center justify-between border-b-2 border-amber-400 pb-6 mb-12">
+          <div className="text-left">
+            <Star className="h-12 w-12 text-amber-400 mb-4" fill="currentColor" />
+            <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-800 tracking-tight">Featured Documents</h1>
+            <p className="mt-2 max-w-2xl text-lg text-gray-600">A curated collection of our top-rated and most valuable resources.</p>
+          </div>
+          <div>
+            <ReloadButton />
+          </div>
         </div>
 
         {/* --- SHOWCASE & GRID SECTION --- */}
@@ -106,7 +109,11 @@ const FeaturedDocumentsPage: React.FC = () => {
               <section>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                   {remainingDocuments.map(doc => (
-                    <DocumentCard key={doc.documentId} document={doc} />
+                    <DocumentCard
+                      key={doc.documentId}
+                      document={doc}
+                      onCardClick={() => navigate(`/documents/${doc.documentId}`)}
+                    />
                   ))}
                 </div>
               </section>
