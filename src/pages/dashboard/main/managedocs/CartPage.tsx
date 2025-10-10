@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { documentsApi } from '../../../../features/documents/docmentsApi';
+import { store } from '../../../../app/store';
 import { AnimatePresence } from 'framer-motion';
 import {
   selectCartItems,
@@ -31,6 +33,20 @@ const CartPage: React.FC = () => {
     dispatch(clearCart());
     setPaymentModalOpen(false);
     setCheckoutSuccess(true);
+  };
+
+  const navigate = useNavigate();
+
+  const goToLibrary = () => {
+    // Invalidate the UserLibrary tag to force a refetch on the library page
+    try {
+  // cast to unknown then never to satisfy TypeScript signature for invalidateTags payload
+  store.dispatch(documentsApi.util.invalidateTags([{ type: 'UserLibrary', id: 'CURRENT_USER' }] as unknown as never));
+    } catch (e) {
+      // graceful fallback if util.invalidateTags isn't callable here
+      // we'll still navigate; the library query should re-run when the page mounts
+    }
+    navigate('/dashboard/library');
   };
 
   const itemsToDisplay = isCheckoutSuccess ? purchasedItems : cartItems;
@@ -107,9 +123,9 @@ const CartPage: React.FC = () => {
             <div className="mt-8 p-4 bg-white rounded-lg shadow-sm border">
                 <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
                     <p className="text-gray-700 font-medium">What's next?</p>
-                    <Link to="/dashboard/my-library" className="w-full sm:w-auto">
-                        <Button variant="secondary" className="w-full">Go to My Library</Button>
-                    </Link>
+          <div className="w-full sm:w-auto">
+            <Button variant="secondary" className="w-full" onClick={goToLibrary}>Go to My Library</Button>
+          </div>
                     <Link to="/dashboard/documents" className="w-full sm:w-auto">
                         <Button className="w-full">Continue Browsing</Button>
                     </Link>
