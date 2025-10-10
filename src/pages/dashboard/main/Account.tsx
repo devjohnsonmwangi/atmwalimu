@@ -122,7 +122,7 @@ const ChangeRoleModal = ({ isOpen, onClose, onConfirm, user, isUpdating }: { isO
 
 // --- Main Page Component ---
 function Account() {
-  const { data: usersData, isLoading: usersLoading, error: usersError, refetch: refetchUsers, isFetching } = usersAPI.useFetchUsersQuery();
+  const { data: usersData, isLoading: usersLoading, error: usersError, refetch: refetchUsers, isFetching } = usersAPI.useFetchUsersQuery(undefined, { refetchOnMountOrArgChange: true, refetchOnFocus: true, refetchOnReconnect: true });
   const [updateUserRoleByAdmin, { isLoading: isUpdatingRole }] = usersAPI.useUpdateUserRoleByAdminMutation();
   const [deleteUserMutation, { isLoading: isDeleting }] = usersAPI.useDeleteUserMutation();
 
@@ -135,6 +135,12 @@ function Account() {
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => { document.documentElement.classList.toggle('dark', isDarkMode); localStorage.setItem('theme', isDarkMode ? 'dark' : 'light'); }, [isDarkMode]);
+
+  // Ensure we refetch when the page mounts to show the latest users.
+  useEffect(() => {
+    // call refetch to guarantee fresh data when entering the Account page
+    try { refetchUsers(); } catch (err) { /* best-effort */ }
+  }, [refetchUsers]);
 
   const handleRegistrationSuccess = () => refetchUsers();
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => { setFilters({ ...filters, [e.target.name]: e.target.value }); setCurrentPage(1); };
